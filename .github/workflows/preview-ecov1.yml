@@ -43,4 +43,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# Pages activation trigger: 2026-08-30
+# Retrigger after enabling Actions write permissions: 2026-08-30
