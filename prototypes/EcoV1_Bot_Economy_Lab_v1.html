@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>EcoV1 — Bot Economy Lab</title>
+<style>
+:root{--bg:#0c1016;--panel:#141b24;--panel2:#10161e;--text:#f5f7fa;--muted:#92a0b3;--line:#263243;--good:#65d58b;--bad:#ff6b6b;--warn:#f3c969;--accent:#7ab7ff;--hot:#ff9f43}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#090d12,#0e141c);color:var(--text);font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input{font:inherit}button{cursor:pointer}
+.app{max-width:1180px;margin:auto;padding:14px}.top{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:12px}.title h1{font-size:22px;margin:0}.title p{margin:4px 0 0;color:var(--muted)}
+.kpis{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.pill{background:var(--panel);border:1px solid var(--line);padding:8px 10px;border-radius:12px}.pill b{font-size:16px}.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:12px}.stack{display:grid;gap:12px}.card{background:rgba(20,27,36,.96);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 8px 24px #0004}.card h2{font-size:15px;margin:0 0 10px}.sub{font-size:12px;color:var(--muted)}
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.prod{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:10px}.prod h3{margin:0 0 6px;font-size:14px}.price{font-size:22px;font-weight:800}.trend{font-size:12px}.up{color:var(--good)}.down{color:var(--bad)}.flat{color:var(--muted)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{border:1px solid #33445b;background:#1b2633;color:#fff;padding:8px 10px;border-radius:10px}.btn:hover{filter:brightness(1.15)}.btn.good{background:#173723;border-color:#275c38}.btn.warn{background:#403519;border-color:#725d27}.btn.bad{background:#431d22;border-color:#7a3038}.btn:disabled{opacity:.45;cursor:not-allowed}
+.inv{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.slot{min-height:54px;border:1px dashed #34445a;background:#0f151d;border-radius:10px;padding:6px;font-size:12px}.slot.rot{border-color:#7d3434;background:#251517}.slot b{display:block}.timer{height:5px;background:#222e3d;border-radius:6px;overflow:hidden;margin-top:5px}.timer i{display:block;height:100%;background:var(--accent);width:50%}.timer i.danger{background:var(--bad)}
+.bots{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.bot{background:#101720;border:1px solid var(--line);border-radius:12px;padding:9px}.bot .name{display:flex;justify-content:space-between;font-weight:800}.tag{font-size:11px;color:var(--muted)}.meter{height:6px;background:#202b39;border-radius:4px;overflow:hidden;margin-top:6px}.meter i{display:block;height:100%;background:var(--hot)}
+.order{display:grid;grid-template-columns:1fr 70px 70px;gap:6px;padding:6px 0;border-top:1px solid #202b39}.order:first-child{border-top:0}.ask{color:var(--bad)}.bid{color:var(--good)}
+.contract{border:1px solid #3d4d63;background:#111923;border-radius:12px;padding:10px}.contract strong{font-size:15px}.prog{height:9px;background:#202c3a;border-radius:8px;overflow:hidden;margin:8px 0}.prog i{display:block;height:100%;background:linear-gradient(90deg,#6ba8ff,#74e0a4)}
+.feed{height:300px;overflow:auto;background:#0d131b;border:1px solid var(--line);border-radius:12px;padding:8px}.event{padding:7px;border-bottom:1px solid #1f2936}.event:last-child{border-bottom:0}.event small{color:var(--muted)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}.select{background:#101720;color:#fff;border:1px solid var(--line);border-radius:10px;padding:8px}.research{font-size:12px;color:var(--muted)}
+@media(max-width:820px){.grid{grid-template-columns:1fr}.products{grid-template-columns:1fr}.bots{grid-template-columns:1fr}.inv{grid-template-columns:repeat(3,1fr)}.top{grid-template-columns:1fr}.kpis{justify-content:flex-start}.feed{height:240px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="title"><h1>EcoV1 — Bot Economy Lab</h1><p>Graybox económico: 1 jugador + 4 bots persistentes + Tomate/Huevo/Madera + decay + contratos + rivalidad.</p></div>
+    <div class="kpis"><div class="pill">Oro <b id="gold">0</b></div><div class="pill">Patrimonio <b id="wealth">0</b></div><div class="pill">Sesión <b id="clock">00:00</b></div><div class="pill">Decisiones <b id="decisions">0</b></div></div>
+  </div>
+  <div class="grid">
+    <div class="stack">
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><h2>Mercado vivo</h2><div class="toolbar"><select id="preset" class="select"><option value="soft">Suave</option><option value="medium" selected>Medio</option><option value="hard">Agresivo</option></select><button class="btn" id="pause">Pausar</button><button class="btn bad" id="reset">Reiniciar</button></div></div>
+        <div id="products" class="products"></div>
+      </div>
+      <div class="card"><h2>Producción e inventario <span class="sub">— los perecederos envejecen</span></h2><div class="row" style="margin-bottom:9px"><button class="btn good" data-produce="tomato">Plantar Tomate (8 Oro)</button><button class="btn good" data-produce="egg">Producir Huevo (10 Oro)</button><button class="btn good" data-produce="wood">Trabajar Madera (14 Oro)</button></div><div id="inventory" class="inv"></div></div>
+      <div class="card"><h2>Contrato premium</h2><div id="contract"></div></div>
+      <div class="card"><h2>Almacén / progreso dotado</h2><div class="sub" id="warehouseText"></div><div class="prog"><i id="warehouseBar"></i></div><div class="row"><button class="btn warn" id="contributeWood">Aportar 1 Madera</button><span class="sub">Completarlo aumenta slots y preservación.</span></div></div>
+      <div class="card"><h2>Actividad / historia emergente</h2><div id="feed" class="feed"></div></div>
+    </div>
+    <div class="stack">
+      <div class="card"><h2>Actores económicos persistentes</h2><div id="bots" class="bots"></div></div>
+      <div class="card"><h2>Libro de órdenes</h2><div id="orders"></div></div>
+      <div class="card"><h2>Némesis actual</h2><div id="nemesis"></div></div>
+      <div class="card"><h2>Laboratorio de investigación</h2><div class="research">Este prototipo implementa candidatos derivados de 60 rondas: bots legibles e imperfectos, decay calibrable, cuellos de botella, endowed progress, mercado con spreads, eventos, oportunidades de revancha y telemetría. Los valores son de prueba, no balance canónico.</div><div class="row" style="margin-top:8px"><button class="btn" id="forceShock">Forzar shock</button><button class="btn" id="forceSnipe">Forzar snipe</button><button class="btn" id="forceContract">Nuevo contrato</button></div></div>
+    </div>
+  </div>
+</div>
+<script>
+(()=>{
+const CFG={soft:{decay:95,shock:.12,bot:0.8,rotFee:0,rotBlocks:false},medium:{decay:70,shock:.22,bot:1,rotFee:3,rotBlocks:true},hard:{decay:48,shock:.34,bot:1.25,rotFee:5,rotBlocks:true}};
+const P={tomato:{name:'Tomate',base:18,cost:8,prod:7,life:0},egg:{name:'Huevo',base:24,cost:10,prod:10,life:0},wood:{name:'Madera',base:31,cost:14,prod:15,life:null}};
+let state;
+function fresh(){return {gold:120,start:Date.now(),paused:false,decisions:0,preset:'medium',prices:{tomato:18,egg:24,wood:31},hist:{tomato:[18],egg:[24],wood:[31]},inv:[],slots:6,warehouse:{tier:2,have:8,need:10},contract:null,bots:[
+{id:'baron',name:'Barón_Rojo',style:'Acumulador',fav:'wood',cash:190,inv:{tomato:0,egg:1,wood:7},rival:15,trust:50,last:'observando madera'},
+{id:'shark',name:'Tiburón_7',style:'Oportunista',fav:'tomato',cash:150,inv:{tomato:5,egg:0,wood:0},rival:10,trust:45,last:'buscando perecederos'},
+{id:'queen',name:'Reina_Huevo',style:'Especialista',fav:'egg',cash:170,inv:{tomato:1,egg:7,wood:1},rival:4,trust:58,last:'preparando envíos'},
+{id:'midas',name:'Midas',style:'Especulador',fav:'trend',cash:220,inv:{tomato:2,egg:2,wood:2},rival:8,trust:52,last:'siguiendo tendencia'}],feed:[],prod:[],nextContract:Date.now()+12000,nextTick:0};}
+function save(){localStorage.setItem('ecov1-botlab',JSON.stringify(state))}function load(){try{state=JSON.parse(localStorage.getItem('ecov1-botlab'))||fresh()}catch(e){state=fresh()} if(!state.start)state.start=Date.now();}
+function log(msg,kind=''){state.feed.unshift({t:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}),msg,kind});state.feed=state.feed.slice(0,80)}
+function decide(){state.decisions++;save()}
+function cfg(){return CFG[state.preset]}
+function addItem(type,qty=1,life=null){for(let q=0;q<qty;q++){if(state.inv.length>=state.slots)return false;state.inv.push({id:crypto.randomUUID?crypto.randomUUID():Math.random().toString(36),type,age:0,life:life??(type==='tomato'?cfg().decay:type==='egg'?cfg().decay*1.5:null),rot:false})}return true}
+function count(type,usable=true){return state.inv.filter(x=>x.type===type && (!usable||!x.rot)).length}
+function remove(type,n,usable=true){for(let i=state.inv.length-1;i>=0&&n>0;i--){let x=state.inv[i];if(x.type===type&&(!usable||!x.rot)){state.inv.splice(i,1);n--}}return n===0}
+function produce(type){let p=P[type]; if(state.gold<p.cost){log('No tienes Oro suficiente.','bad');return} if(state.prod.length>=3){log('Máximo 3 producciones simultáneas.','bad');return} state.gold-=p.cost;state.prod.push({type,end:Date.now()+p.prod*1000});log(`Iniciaste ${p.name}. Coste ${p.cost} Oro.`);decide()}
+function finishProd(){let now=Date.now();for(let i=state.prod.length-1;i>=0;i--){let x=state.prod[i];if(now>=x.end){let ok=addItem(x.type);log(ok?`${P[x.type].name} listo y guardado.`:`Producción lista pero inventario lleno: ${P[x.type].name} perdido.` ,ok?'good':'bad');state.prod.splice(i,1)}}}
+function decay(dt){for(let x of state.inv){if(x.life&&!x.rot){x.age+=dt;if(x.age>=x.life){x.rot=true;log(`${P[x.type].name} se pudrió${cfg().rotBlocks?' y bloquea un slot':''}.`,'bad')}}}}
+function cleanup(id){let i=state.inv.findIndex(x=>x.id===id);if(i<0)return;let fee=cfg().rotFee;if(state.gold<fee){log(`Necesitas ${fee} Oro para limpiar.`,'bad');return}state.gold-=fee;state.inv.splice(i,1);log(`Desecho retirado. Coste ${fee} Oro.`);decide()}
+function sell(type){let i=state.inv.findIndex(x=>x.type===type&&!x.rot);if(i<0){log(`No tienes ${P[type].name} vendible.`,'bad');return}let price=Math.max(1,Math.round(state.prices[type]*(.94+Math.random()*.08)));state.inv.splice(i,1);state.gold+=price;log(`Vendiste ${P[type].name} por ${price} Oro.`,'good');state.prices[type]*=.985;decide()}
+function buy(type){let price=Math.ceil(state.prices[type]*1.06);if(state.gold<price||state.inv.length>=state.slots){log('Compra bloqueada por Oro o espacio.','bad');return}state.gold-=price;addItem(type);state.prices[type]*=1.02;log(`Compraste ${P[type].name} por ${price} Oro.`);decide()}
+function botTick(){let c=cfg(); for(let b of state.bots){let type=b.fav==='trend'?Object.keys(state.prices).sort((a,z)=>state.hist[z].slice(-1)[0]-state.hist[z][0]-(state.hist[a].slice(-1)[0]-state.hist[a][0]))[0]:b.fav;let pr=state.prices[type];let action=Math.random(); if(b.id==='baron'&&type==='wood'){ if(action<.62*c.bot&&b.cash>pr){b.cash-=pr;b.inv.wood++;state.prices.wood*=1.015; b.last='acumuló madera'; if(Math.random()<.25){b.rival+=1;log(`${b.name} compró Madera y presiona el precio.`,'warn')}} else if(b.inv.wood>8&&b.cash<90){b.inv.wood--;b.cash+=pr*.9;state.prices.wood*=.97;b.last='liquidó madera';log(`${b.name} necesita liquidez y suelta Madera.`,'good')}
+ else if(b.id==='shark'){let near=state.inv.filter(x=>x.type==='tomato'&&!x.rot&&x.life&&x.age/x.life>.72).length;if(near&&Math.random()<.55){let offer=Math.max(3,Math.round(state.prices.tomato*.55));b.last='te hizo una oferta de urgencia';log(`${b.name} detecta tus tomates viejos: ofrece ${offer} Oro por unidad.`,'warn')}}
+ else if(b.id==='queen'){if(Math.random()<.45){state.prices.egg*=1.012;b.last='compró huevos para contrato'}}
+ else {let keys=['tomato','egg','wood'];let t=keys[Math.floor(Math.random()*3)];state.prices[t]*=Math.random()<.55?1.012:.99;b.last=`especuló en ${P[t].name}`}}
+ }
+ if(Math.random()<c.shock*.18) shock(); normalizePrices();}
+function normalizePrices(){for(let k in state.prices){let base=P[k].base;state.prices[k]=Math.max(base*.45,Math.min(base*2.4,state.prices[k]));state.hist[k].push(Math.round(state.prices[k]));state.hist[k]=state.hist[k].slice(-18)}}
+function shock(){let t=['tomato','egg','wood'][Math.floor(Math.random()*3)];let up=Math.random()<.58;let m=up?1.12+Math.random()*.16:.78+Math.random()*.12;state.prices[t]*=m;log(`${up?'Demanda':'Exceso de oferta'} inesperad${up?'a':'o'} en ${P[t].name}. Precio ${up?'sube':'cae'}.`,up?'good':'bad')}
+function newContract(){let hard=Math.random()<.5;state.contract={id:Math.random(),req:{tomato:hard?3:2,egg:hard?2:1,wood:hard?2:1},reward:hard?125:78,expires:Date.now()+(hard?70:55)*1000};log(`Nuevo contrato ${hard?'PREMIUM':'RÁPIDO'} disponible.`,'warn')}
+function fulfill(){let c=state.contract;if(!c)return;for(let k in c.req)if(count(k)<c.req[k]){log('Te faltan recursos para el contrato.','bad');return}for(let k in c.req)remove(k,c.req[k]);state.gold+=c.reward;state.contract=null;log(`Contrato completado: +${c.reward} Oro.`,'good');decide();setTimeout(newContract,3500)}
+function warehouse(){if(count('wood')<1){log('Necesitas Madera para aportar.','bad');return}remove('wood',1);state.warehouse.have++;log('Aportaste 1 Madera al almacén.','good');decide();if(state.warehouse.have>=state.warehouse.need){state.warehouse.tier++;state.slots+=2;state.warehouse.need+=state.warehouse.tier===3?10:14;state.warehouse.have=Math.max(0,state.warehouse.need-6);for(let x of state.inv)if(x.life&&!x.rot)x.life*=1.18;log(`¡Almacén Tier ${state.warehouse.tier}! +2 slots y más conservación.`,'good')}}
+function forceSnipe(){let b=state.bots.sort((a,z)=>z.rival-a.rival)[0];let t=['tomato','egg','wood'][Math.floor(Math.random()*3)];b.rival+=6;b.last=`te arrebató una oportunidad en ${P[t].name}`;state.prices[t]*=1.08;log(`${b.name} te ganó una compra de ${P[t].name} en el último segundo. Su rivalidad aumenta.`,'bad');decide()}
+function render(){
+ document.querySelector('#gold').textContent=Math.floor(state.gold);let wealth=state.gold+state.inv.reduce((s,x)=>s+(x.rot?0:state.prices[x.type]),0);document.querySelector('#wealth').textContent=Math.floor(wealth);let sec=Math.floor((Date.now()-state.start)/1000);document.querySelector('#clock').textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;document.querySelector('#decisions').textContent=state.decisions;document.querySelector('#preset').value=state.preset;
+ document.querySelector('#products').innerHTML=Object.keys(P).map(k=>{let h=state.hist[k],d=h.length>1?h[h.length-1]-h[h.length-2]:0,cls=d>0?'up':d<0?'down':'flat';return `<div class="prod"><h3>${P[k].name}</h3><div class="price">${Math.round(state.prices[k])} <span class="sub">Oro</span></div><div class="trend ${cls}">${d>0?'▲':d<0?'▼':'•'} ${Math.abs(Math.round(d))}</div><div class="row" style="margin-top:7px"><button class="btn" onclick="E.buy('${k}')">Comprar</button><button class="btn good" onclick="E.sell('${k}')">Vender</button></div></div>`}).join('');
+ let prods=state.prod.map(x=>`<div class="slot"><b>Produciendo ${P[x.type].name}</b><span>${Math.max(0,Math.ceil((x.end-Date.now())/1000))}s</span></div>`).join('');
+ let slots=state.inv.map(x=>{let pct=x.life?Math.min(100,x.age/x.life*100):0;return `<div class="slot ${x.rot?'rot':''}"><b>${x.rot?'☣ Desecho':P[x.type].name}</b>${x.life?`<span>${x.rot?'Podrido':Math.max(0,Math.ceil(x.life-x.age))+'s'}</span><div class="timer"><i class="${pct>70?'danger':''}" style="width:${pct}%"></i></div>`:'<span>No perecedero</span>'}${x.rot?`<button class="btn bad" style="margin-top:4px;padding:4px 6px" onclick="E.clean('${x.id}')">Limpiar ${cfg().rotFee}</button>`:''}</div>`}).join('');let empties=Math.max(0,state.slots-state.inv.length);document.querySelector('#inventory').innerHTML=prods+slots+Array.from({length:empties},()=>'<div class="slot sub">Vacío</div>').join('');
+ document.querySelector('#bots').innerHTML=state.bots.map(b=>`<div class="bot"><div class="name"><span>${b.name}</span><span class="tag">${b.style}</span></div><div class="tag">Fav: ${b.fav==='trend'?'tendencias':P[b.fav].name} · Oro ${Math.round(b.cash)}</div><div class="tag">Último: ${b.last}</div><div class="tag">Rivalidad ${b.rival} · Confianza ${b.trust}</div><div class="meter"><i style="width:${Math.min(100,b.rival)}%"></i></div></div>`).join('');
+ let orders=[];for(let k of ['tomato','egg','wood']){let p=Math.round(state.prices[k]);orders.push(`<div class="order"><b>${P[k].name}</b><span class="bid">BID ${Math.max(1,p-2)}</span><span class="ask">ASK ${p+2}</span></div>`)}document.querySelector('#orders').innerHTML=orders.join('');
+ if(!state.contract)newContract();let c=state.contract;let req=Object.entries(c.req).map(([k,n])=>`${P[k].name} ${count(k)}/${n}`).join(' · ');let remain=Math.max(0,Math.ceil((c.expires-Date.now())/1000));document.querySelector('#contract').innerHTML=`<div class="contract"><strong>${c.reward} Oro</strong><div class="sub">${req}</div><div class="sub">Expira en ${remain}s</div><button class="btn good" style="margin-top:8px" onclick="E.fulfill()">Entregar contrato</button></div>`;
+ document.querySelector('#warehouseText').textContent=`Tier ${state.warehouse.tier} — ${state.warehouse.have}/${state.warehouse.need} aportes`;document.querySelector('#warehouseBar').style.width=`${Math.min(100,state.warehouse.have/state.warehouse.need*100)}%`;
+ let nem=state.bots.slice().sort((a,z)=>z.rival-a.rival)[0];document.querySelector('#nemesis').innerHTML=`<b>${nem.name}</b><div class="sub">Rivalidad ${nem.rival}. ${nem.last}.</div><div class="sub" style="margin-top:5px">Pista: observa su liquidez e inventario favorito; cuando quede cargado y corto de Oro puede aparecer una ventana de contraataque.</div>`;
+ document.querySelector('#feed').innerHTML=state.feed.map(e=>`<div class="event"><small>${e.t}</small><div class="${e.kind==='bad'?'down':e.kind==='good'?'up':e.kind==='warn'?'trend':''}">${e.msg}</div></div>`).join('');
+}
+let last=performance.now();function loop(t){let dt=(t-last)/1000;last=t;if(!state.paused){finishProd();decay(dt);if(Date.now()>state.nextTick){botTick();state.nextTick=Date.now()+2400/cfg().bot}if(state.contract&&Date.now()>state.contract.expires){log('Contrato expiró. El mercado sigue; aparecerá otro.','bad');state.contract=null}save()}render();requestAnimationFrame(loop)}
+load();if(!state.feed.length)log('EcoV1 iniciado. Los bots ya están operando.');
+document.querySelectorAll('[data-produce]').forEach(b=>b.onclick=()=>produce(b.dataset.produce));document.querySelector('#contributeWood').onclick=warehouse;document.querySelector('#forceShock').onclick=()=>{shock();decide()};document.querySelector('#forceSnipe').onclick=forceSnipe;document.querySelector('#forceContract').onclick=()=>{newContract();decide()};document.querySelector('#preset').onchange=e=>{state.preset=e.target.value;log(`Preset cambiado a ${state.preset}.`);decide()};document.querySelector('#pause').onclick=e=>{state.paused=!state.paused;e.target.textContent=state.paused?'Continuar':'Pausar'};document.querySelector('#reset').onclick=()=>{if(confirm('¿Reiniciar la simulación?')){state=fresh();log('Simulación reiniciada.');save()}};
+window.E={buy,sell,clean:cleanup,fulfill};requestAnimationFrame(loop);
+})();
+</script>
+</body></html>
