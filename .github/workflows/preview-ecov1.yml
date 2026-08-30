@@ -43,4 +43,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# Retrigger after enabling Actions write permissions: 2026-08-30
+# Retrigger after allowing ecov1-bots-lab in github-pages environment: 2026-08-30
