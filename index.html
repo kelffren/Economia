@@ -1,1 +1,820 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Caja Negra Lab — EcoV1</title><style>:root{--bg:#020306;--card:#060a10;--alt:#0c121c;--line:#182231;--txt:#c9d1d9;--dim:#6e7681;--gold:#f1e05a;--green:#2ea043;--red:#f85149;--blue:#58a6ff;--purple:#bc8cff;--orange:#ffa657;--flash:#ff0055}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:11px ui-monospace,SFMono-Regular,Menlo,monospace;padding:8px}.hidden{display:none!important}.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px;margin-bottom:8px}.box,.panel,.guide{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px}.label{font-size:8px;color:var(--dim);text-transform:uppercase;font-weight:800}.value{font-size:15px;font-weight:900;color:var(--gold);margin-top:2px}.guide{border-color:var(--gold);margin-bottom:8px;background:linear-gradient(180deg,rgba(241,224,90,.1),rgba(241,224,90,.02))}.guide h2{margin:0 0 5px;color:var(--gold);font-size:14px}.guide p{margin:2px 0;line-height:1.4}.guide small{color:var(--dim)}.layout{display:grid;grid-template-columns:1fr;gap:8px}@media(min-width:1100px){.layout{grid-template-columns:1fr 1fr 1fr}}.col{display:flex;flex-direction:column;gap:8px}.head{display:flex;justify-content:space-between;gap:8px;color:var(--blue);font-weight:900;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:4px;margin-bottom:5px}button,input,select{font:inherit}button{background:var(--alt);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:6px;font-weight:800;cursor:pointer}button:disabled{opacity:.4}.green{background:#1b4725;border-color:var(--green);color:#7ee787}.red{background:#4c1d1a;border-color:var(--red);color:#ff7b72}.gold{background:#4a3e14;border-color:var(--gold);color:#fff}.purple{background:#381a4c;border-color:var(--purple);color:#d2a8ff}.orange{background:#4a2810;border-color:var(--orange);color:#ffc680}.flash{background:var(--flash);border-color:#fff;color:#fff}.full{width:100%;margin-top:6px}.item{background:var(--alt);border:1px solid var(--line);border-radius:5px;padding:6px;margin-top:5px}.row{display:flex;justify-content:space-between;gap:6px;align-items:center}.muted{color:var(--dim);font-size:9px}.prog{height:4px;background:#172130;border-radius:99px;overflow:hidden;margin:5px 0}.fill{height:100%;width:0;background:var(--blue)}.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.slot{height:28px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;border-radius:4px}.slot.on{border-style:solid;background:var(--alt)}.slot.lock{border-color:var(--red);color:var(--red)}.book{display:grid;grid-template-columns:1fr 1fr;gap:5px}.entry{display:flex;justify-content:space-between;padding:3px;background:rgba(255,255,255,.02);margin:2px 0;cursor:pointer}.ask{color:#ff7b72;border-left:2px solid var(--red)}.bid{color:#7ee787;border-left:2px solid var(--green)}.chat{height:160px;overflow:auto;background:#020305;border:1px solid var(--line);border-radius:4px;padding:5px}.msg{margin:3px 0}.a{font-weight:900}.baron{color:var(--red)}.traidor{color:var(--purple)}.consorcio{color:var(--blue)}.retail{color:var(--green)}.random{color:var(--orange)}.me{color:var(--gold)}.ticker{border:1px solid var(--blue);color:var(--blue);padding:6px;border-radius:5px;margin-bottom:8px}.frenzy{border:1px solid var(--gold);padding:6px;border-radius:5px;margin-bottom:8px}.alert{display:none;border:2px solid var(--flash);padding:7px;border-radius:5px;margin-bottom:8px;background:rgba(255,0,85,.12)}.log{height:100px;overflow:auto;background:#020305;border:1px solid var(--line);padding:5px;color:var(--dim)}</style></head><body><div id="audit" class="alert"><span>⚖️ INSPECCIÓN FISCAL</span> <button class="red" onclick="resolveAudit()">Pagar 30G (<span id="auditT">10</span>s)</button></div><div id="sniper" class="alert"><span>🚨 OFERTA RELÁMPAGO: <b id="sniperText"></b></span> <button class="flash" onclick="snipe()">COMPRAR (<span id="sniperT">4</span>s)</button></div><div id="guide" class="guide"><h2 id="gTitle">🎯 TU PRIMER NEGOCIO</h2><p id="gText">Tienes <b>100 Oro</b>. Aprende primero una cosa: producir y vender.</p><small id="gStep">Paso 1 · Produce 1 tomate.</small><button id="gBtn" class="green full" onclick="guideAction()">🍅 PRODUCIR 1 TOMATE · 12G</button></div><div id="frenzy" class="frenzy hidden"><div class="row"><b id="fLabel">⚡ FRENESÍ</b><b id="fPct">0%</b></div><div class="prog"><div id="fFill" class="fill"></div></div></div><div class="hud"><div class="box"><div class="label">Oro</div><div id="gold" class="value">100</div></div><div class="box"><div class="label">Patrimonio</div><div id="worth" class="value">100</div></div><div id="hTokens" class="box hidden"><div class="label">Vales</div><div id="tokens" class="value">0 🎟️</div></div><div id="hRank" class="box hidden"><div class="label">Rango</div><div id="rank" class="value" style="color:var(--purple)">I: Aprendiz</div></div><div id="hDebt" class="box hidden"><div class="label">Deuda</div><div id="debt" class="value" style="color:var(--red)">0</div></div><div id="hTax" class="box hidden"><div class="label">Cierre fiscal</div><div id="tax" class="value">60s</div></div></div><div id="ticker" class="ticker hidden">SEÑAL MACRO: <span id="news">Canales de suministro estables.</span></div><div class="layout"><div class="col"><div class="panel"><div class="head"><span>Producción</span><span id="qCount">0/3</span></div><div class="item"><div class="row"><b>🍅 Tomate</b><span class="muted">40s · 12G · 1 slot</span></div><div class="prog"><div id="pTomato" class="fill"></div></div><div class="row"><button onclick="produce('tomato',1)">1x (12)</button><button onclick="produce('tomato',3)">3x (36)</button></div></div><div id="egg" class="item hidden"><div class="row"><b>🥚 Huevo</b><span class="muted">110s · 45G · 2 slots</span></div><div class="prog"><div id="pEgg" class="fill"></div></div><div class="row"><button onclick="produce('egg',1)">1x</button><button onclick="produce('egg',2)">2x</button></div></div><div id="wood" class="item hidden"><div class="row"><b>🪵 Madera</b><span class="muted">310s · 140G · 5 slots</span></div><div class="prog"><div id="pWood" class="fill"></div></div><button class="full" onclick="produce('wood',1)">Producir</button></div></div><div id="workshop" class="panel hidden"><div class="head">Taller & Overdrive</div><div class="item"><div class="row"><b>🥫 Salsa</b><span class="muted">3 🍅 + 15G</span></div><div class="prog"><div id="pSauce" class="fill"></div></div><div class="row"><button class="gold" onclick="processSauce(false)">Normal 90s</button><button class="flash" onclick="processSauce(true)">⚡ 15s</button></div></div><div class="row"><button class="purple" onclick="pawnWood()">Empeñar +95G</button><button class="green" onclick="redeemWood()">Rescatar 115G</button></div></div><div id="pledge" class="panel hidden"><div class="head"><span>Fondo Gremial</span><span id="pledgeN">0G</span></div><div class="muted">+2G/s por cada 100G invertidos.</div><div class="row"><button class="gold" onclick="invest(100)">Invertir 100G</button><button class="purple" onclick="withdraw()">Retirar</button></div></div></div><div class="col"><div id="forex" class="panel hidden"><div class="head"><span>Vales Forex</span><span>1🎟️=<b id="rate">24</b>G</span></div><div class="row"><button class="orange" onclick="forexTrade('buy')">Comprar</button><button class="gold" onclick="forexTrade('sell')">Liquidar</button></div></div><div id="market" class="panel hidden"><div class="head"><span>Libro de Órdenes</span><select id="marketType" onchange="renderBook()"><option value="tomato">🍅</option><option value="egg">🥚</option><option value="wood">🪵</option><option value="sauce">🥫</option></select></div><div class="book"><div><b style="color:var(--red)">ASKS</b><div id="asks"></div></div><div><b style="color:var(--green)">BIDS</b><div id="bids"></div></div></div><div class="row" style="margin-top:6px"><input id="oPrice" type="number" placeholder="Precio" style="width:65px;background:var(--bg);color:#fff;border:1px solid var(--line)"><input id="oQty" type="number" value="1" style="width:45px;background:var(--bg);color:#fff;border:1px solid var(--line)"><button class="red" onclick="placeOrder('sell')">Venta</button><button class="green" onclick="placeOrder('buy')">Compra</button><button class="purple" onclick="sweep()">Barrer</button></div><div id="myOrders" class="muted" style="margin-top:5px"></div></div><div id="social" class="panel hidden"><div class="head"><span>💬 Plaza Pública</span><span id="topic">GENERAL</span></div><div id="chat" class="chat"></div><div class="row" style="margin-top:5px"><input id="chatIn" style="flex:1;background:var(--bg);color:#fff;border:1px solid var(--line);padding:6px" placeholder="Habla del mercado..." onkeydown="if(event.key==='Enter')sendChat()"><button class="gold" onclick="sendChat()">Enviar</button></div></div><div id="black" class="panel hidden"><div class="head">Mercado Negro & Expediciones</div><div class="row"><button class="purple" onclick="sabotage()">Sabotear 25G</button><button class="orange" onclick="chest()">Cofre 60G</button></div><div class="row"><button onclick="expedition('safe')">Segura</button><button class="gold" onclick="expedition('pirate')">Pirata</button><button class="flash" onclick="expedition('storm')">Tormenta</button></div><div id="caravan" class="muted">Puerto OK</div></div></div><div class="col"><div class="panel"><div class="head"><span>Almacén</span><span id="storageN">0/10</span></div><div id="slots" class="slots"></div><div id="inventory"></div><div class="row" style="margin-top:5px"><button id="upStorage" class="hidden" onclick="upgradeStorage()">Ampliar +5 · 150G</button><button id="unfreeze" class="red hidden" onclick="unfreeze()">Rescatar slots 40G</button></div></div><div id="finance" class="panel hidden"><div class="head">Crédito & Prestigio</div><div class="row"><button class="red" onclick="loan()">Pedir 150G</button><button class="green" onclick="payDebt()">Pagar deuda</button></div><button class="purple full" onclick="relic()">💎 Sello del Barón · 450G + 10🎟️</button><button class="gold full" onclick="rankUp()">Subir rango · <span id="rankCost">300</span>G</button></div><div id="contracts" class="panel hidden"><div class="head">Contratos</div><div id="contractList"></div></div><div id="logs" class="panel hidden"><div class="head">Registro</div><div id="log" class="log"></div></div></div></div><script>const $=id=>document.getElementById(id);const S={tomato:{n:'Tomate',i:'🍅',c:12,d:40,s:1,x:1.6},egg:{n:'Huevo',i:'🥚',c:45,d:110,s:2,x:.5},wood:{n:'Madera',i:'🪵',c:140,d:310,s:5,x:0},sauce:{n:'Salsa',i:'🥫',c:15,d:90,s:1,x:0}};const R=[{n:'I: Aprendiz',c:300,t:1},{n:'II: Comerciante',c:800,t:.8},{n:'III: Magnate Local',c:2000,t:.6}];const st={g:100,tok:0,rate:24,debt:0,rank:1,relic:false,lim:10,frozen:0,tax:60,taxRate:15,inv:[],prod:[],proc:[],orders:[],pledge:0,pawn:0,frenzy:0,fActive:false,fTimer:0,audit:false,auditT:10,sniper:false,sniperT:4,sType:'wood',sQty:3,sPrice:35,caravan:null,contracts:[],book:{tomato:{asks:[{p:16,q:12,b:'Barón_Rojo'}],bids:[{p:11,q:8,b:'Traidor_01'}]},egg:{asks:[{p:52,q:4,b:'Consorcio'}],bids:[{p:41,q:6,b:'Barón_Rojo'}]},wood:{asks:[{p:190,q:2,b:'Consorcio'}],bids:[{p:145,q:4,b:'Bot_Delta'}]},sauce:{asks:[{p:85,q:2,b:'Consorcio'}],bids:[{p:68,q:3,b:'Barón_Rojo'}]}}};const ob={step:1,ready:false,sold:false,market:false,work:false,finance:false,full:false};const mem={topic:'general',recent:[],threads:{tomates:[['Barón_Rojo','baron','El mercado de tomates está bajo presión hoy.'],['Traidor_01','traidor','Yo miraría el bid antes de llenar el almacén.'],['Bot_Scrap','retail','Mis tomates están perdiendo calidad; venderé pronto.']],vales:[['Consorcio','consorcio','Los Vales siguen cerca de su rango normal.'],['Especulador_X','random','Liquidé Vales para tener Oro listo.']],madera:[['Consorcio','consorcio','La madera inmoviliza capital, pero puede pagar bien.'],['Barón_Rojo','baron','Quien controla madera puede esperar mejores precios.']],deuda:[['Traidor_01','traidor','El crédito da velocidad, pero luego te come ventas.'],['Bot_Scrap','retail','No pediría deuda sin una salida clara.']],general:[['Sombra_09','random','¿Qué margen están buscando hoy?'],['Barón_Rojo','baron','Yo miro liquidez antes que cantidad.']]}};function show(id){$(id)?.classList.remove('hidden')}function hide(id){$(id)?.classList.add('hidden')}function lg(s){const d=document.createElement('div');d.textContent=s;$('log').prepend(d)}function guide(t,x,s,b,dis=false){$('gTitle').innerHTML=t;$('gText').innerHTML=x;$('gStep').textContent=s;$('gBtn').innerHTML=b;$('gBtn').disabled=dis}function slotsUsed(){return st.inv.reduce((a,it)=>a+(it.type==='waste'?1:S[it.type].s),0)+st.frozen}function chat(a,c,text){if(mem.recent.includes(text))return;mem.recent.push(text);if(mem.recent.length>15)mem.recent.shift();const d=document.createElement('div');d.className='msg';d.innerHTML='<span class="a '+c+'">['+a+']:</span> '+text;$('chat').appendChild(d);$('chat').scrollTop=$('chat').scrollHeight}function bot(topic){mem.topic=topic;const arr=mem.threads[topic]||mem.threads.general;const pool=arr.filter(x=>!mem.recent.includes(x[2]));const p=(pool.length?pool:arr)[Math.floor(Math.random()*(pool.length?pool:arr).length)];setTimeout(()=>chat(p[0],p[1],p[2]),700)}function detect(s){s=s.toLowerCase();if(s.includes('tomate')||s.includes('salsa'))return'tomates';if(s.includes('vale')||s.includes('oro'))return'vales';if(s.includes('madera')||s.includes('almac'))return'madera';if(s.includes('deuda')||s.includes('prest')||s.includes('banco'))return'deuda';return mem.topic}function sendChat(){const v=$('chatIn').value.trim();if(!v)return;chat('TÚ','me',v);$('chatIn').value='';bot(detect(v))}function frenzy(n){if(st.fActive)return;st.frenzy=Math.min(100,st.frenzy+n);if(st.frenzy>=100){st.fActive=true;st.fTimer=20;chat('SISTEMA','baron','🔥 Bull Run activado: ventas +50%.')}}function produce(type,n){const s=S[type];if(st.prod.length+n>3)return lg('Máximo 3 producciones.');if(st.g<s.c*n)return lg('Oro insuficiente.');st.g-=s.c*n;for(let i=0;i<n;i++)st.prod.push({type,r:s.d,total:s.d});frenzy(3);if(type==='tomato'&&ob.step===1){ob.step=2;guide('⏳ PRODUCCIÓN EN CURSO','Invertiste <b>12G</b>. Ahora espera a que termine.','Paso 2 · Espera 40 segundos.','ESPERANDO…',true)}render()}function sellBid(type,idx){const b=st.book[type].bids[idx];if(!b)return;const k=st.inv.findIndex(x=>x.type===type);if(k<0)return lg('No tienes '+S[type].n+'.');const it=st.inv[k];let pay=Math.floor(b.p*(it.q/100));if(st.fActive)pay=Math.floor(pay*1.5);if(st.debt>0){const c=Math.floor(pay*.5);st.debt=Math.max(0,st.debt-c);pay-=c}st.g+=pay;b.q--;st.inv.splice(k,1);if(b.q<=0)st.book[type].bids.splice(idx,1);frenzy(6);lg('Vendiste '+S[type].n+' por '+pay+'G.');if(type==='tomato'&&!ob.sold){ob.sold=true;ob.step=3;unlockMarket()}render()}function buyAsk(type,idx){const a=st.book[type].asks[idx];if(!a)return;if(st.g<a.p)return lg('Oro insuficiente.');if(slotsUsed()+S[type].s>st.lim)return lg('Almacén lleno.');st.g-=a.p;a.q--;st.inv.push({type,q:100});if(a.q<=0)st.book[type].asks.splice(idx,1);frenzy(4);render()}function renderBook(){const type=$('marketType').value,b=st.book[type];$('asks').innerHTML='';b.asks.slice().sort((a,z)=>a.p-z.p).forEach(a=>{const i=b.asks.indexOf(a);$('asks').innerHTML+='<div class="entry ask" onclick="buyAsk(\''+type+'\','+i+')"><span>'+a.p+'G</span><span>'+a.q+'x ('+a.b+')</span></div>'});$('bids').innerHTML='';b.bids.slice().sort((a,z)=>z.p-a.p).forEach(x=>{const i=b.bids.indexOf(x);$('bids').innerHTML+='<div class="entry bid" onclick="sellBid(\''+type+'\','+i+')"><span>'+x.p+'G</span><span>'+x.q+'x ('+x.b+')</span></div>'})}function placeOrder(side){const type=$('marketType').value,p=parseInt($('oPrice').value),q=parseInt($('oQty').value)||1;if(!p||p<=0)return lg('Precio inválido.');if(side==='sell'){if(st.inv.filter(x=>x.type===type).length<q)return lg('Sin stock.');for(let n=0;n<q;n++){const i=st.inv.findIndex(x=>x.type===type);st.inv.splice(i,1)}st.orders.push({side,type,p,q});st.book[type].asks.push({p,q,b:'TÚ'})}else{if(st.g<p*q)return lg('Oro insuficiente.');st.g-=p*q;st.orders.push({side,type,p,q});st.book[type].bids.push({p,q,b:'TÚ'})}render()}function sweep(){const type=$('marketType').value,a=st.book[type].asks;let cost=0,q=0;a.forEach(x=>{cost+=x.p*x.q;q+=x.q});if(!q)return;if(st.g<cost)return lg('Oro insuficiente.');if(slotsUsed()+S[type].s*q>st.lim)return lg('Almacén lleno.');st.g-=cost;for(let i=0;i<q;i++)st.inv.push({type,q:100});st.book[type].asks=[{p:Math.floor((a[0]?.p||10)*1.55),q:5,b:'Barón_Rojo'}];frenzy(20);render()}function processSauce(over){if(st.inv.filter(x=>x.type==='tomato').length<3||st.g<15)return lg('Requiere 3 tomates + 15G.');st.g-=15;for(let n=0;n<3;n++){const i=st.inv.findIndex(x=>x.type==='tomato');st.inv.splice(i,1)}const d=over?15:90;st.proc.push({type:'sauce',r:d,total:d,over});frenzy(8);if(!ob.finance){ob.finance=true;ob.step=5;unlockFinance()}render()}function pawnWood(){const i=st.inv.findIndex(x=>x.type==='wood');if(i<0)return lg('Sin madera.');st.inv.splice(i,1);st.pawn++;st.g+=95;render()}function redeemWood(){if(st.pawn<=0)return lg('Sin empeños.');if(st.g<115)return lg('Oro insuficiente.');st.g-=115;st.pawn--;st.inv.push({type:'wood',q:100});render()}function invest(n){if(st.g<n)return lg('Oro insuficiente.');st.g-=n;st.pledge+=n;render()}function withdraw(){st.g+=st.pledge;st.pledge=0;render()}function forexTrade(a){if(a==='buy'){if(st.g<st.rate)return lg('Oro insuficiente.');st.g-=st.rate;st.tok++}else{if(st.tok<1)return lg('Sin Vales.');st.tok--;st.g+=st.rate}frenzy(5);render()}function loan(){st.g+=150;st.debt+=175;bot('deuda');if(!ob.full){ob.step=6;unlockFull()}render()}function payDebt(){const p=Math.min(st.g,st.debt);st.g-=p;st.debt-=p;render()}function relic(){if(st.relic)return;if(st.g<450||st.tok<10)return lg('Requiere 450G + 10 Vales.');st.g-=450;st.tok-=10;st.relic=true;render()}function rankUp(){if(!R[st.rank])return;const c=R[st.rank-1].c;if(st.g<c)return lg('Oro insuficiente.');st.g-=c;st.rank++;render()}function upgradeStorage(){if(st.g<150)return lg('Oro insuficiente.');st.g-=150;st.lim+=5;render()}function unfreeze(){if(st.g<40)return;st.g-=40;st.frozen=0;render()}function resolveAudit(){if(!st.audit)return;if(st.g<30)return;st.g-=30;st.audit=false;render()}function snipe(){if(!st.sniper)return;if(st.g<st.sPrice)return;if(slotsUsed()+S[st.sType].s*st.sQty>st.lim)return;st.g-=st.sPrice;for(let i=0;i<st.sQty;i++)st.inv.push({type:st.sType,q:100});st.sniper=false;frenzy(15);render()}function sabotage(){if(st.g<25)return;st.g-=25;st.book.tomato.bids.unshift({p:28,q:6,b:'Traidor_01 (HACKEADO)'});chat('Traidor_01','traidor','¿Quién tocó mi orden?');render()}function chest(){if(st.g<60)return;st.g-=60;const r=Math.random();if(r<.35)st.tok+=5;else if(r<.7)st.inv.push({type:'wood',q:100});else st.debt+=40;render()}function expedition(route){if(st.caravan)return;if(st.inv.filter(x=>x.type!=='waste').length<3)return lg('Mínimo 3 recursos.');const load=st.inv.splice(0,Math.min(4,st.inv.length));const v=load.reduce((a,x)=>a+(st.book[x.type].bids[0]?.p||15),0);let s=.95,m=1.4;if(route==='pirate'){s=.75;m=2.1}if(route==='storm'){s=.5;m=3.8}st.caravan={r:120,v,s,m};render()}function deliver(i){const c=st.contracts[i];if(!c)return;let ok=true;c.req.forEach(r=>{if(st.inv.filter(x=>x.type===r.type).length<r.q)ok=false});if(!ok)return lg('Faltan recursos.');c.req.forEach(r=>{for(let n=0;n<r.q;n++){const k=st.inv.findIndex(x=>x.type===r.type);st.inv.splice(k,1)}});st.g+=c.g;st.tok+=c.t;st.contracts.splice(i,1);frenzy(12);render()}function unlockMarket(){ob.market=true;['market','social','logs','egg','wood','hRank','upStorage'].forEach(show);guide('✅ YA ENTENDISTE LO BÁSICO','Produjiste y vendiste. Ahora aparece el mercado real.','Paso 3 · Aprende precios y órdenes.','🔓 VER TALLER');chat('HERALDO','consorcio','Nuevo comerciante en la plaza: acaba de cerrar su primera venta.')}function unlockWorkshop(){ob.work=true;show('workshop');show('contracts');guide('🥫 AÑADE VALOR','Ahora puedes convertir 3 tomates + 15G en Salsa.','Paso 4 · Taller, Overdrive y contratos.','IR AL TALLER')}function unlockFinance(){['finance','forex','pledge','hTokens','hDebt','hTax'].forEach(show);guide('🏦 CAPITAL Y RIESGO','Ahora aparecen crédito, Vales y fondo gremial.','Paso 5 · Usa herramientas financieras.','🔓 VER MERCADO COMPLETO')}function unlockFull(){ob.full=true;['frenzy','ticker','black'].forEach(show);guide('🌐 MERCADO COMPLETO','Frenesí, señales macro, auditorías, sniping y expediciones están activos.','Tutorial terminado.','✓ ENTENDIDO')}function guideAction(){if(ob.step===1)return produce('tomato',1);if(ob.step===2&&ob.ready){const b=st.book.tomato.bids;if(!b.length)return;let best=0;for(let i=1;i<b.length;i++)if(b[i].p>b[best].p)best=i;return sellBid('tomato',best)}if(ob.step===3){ob.step=4;return unlockWorkshop()}if(ob.step===4)return;if(ob.step===5){ob.step=6;return unlockFull()}if(ob.step>=6)hide('guide')}function render(){const worth=st.inv.reduce((a,x)=>x.type==='waste'?a:a+(st.book[x.type].bids[0]?.p||10)*(x.q/100),0)+st.g+st.tok*st.rate+st.pledge-st.debt;$('gold').textContent=Math.floor(st.g);$('worth').textContent=Math.floor(worth);$('tokens').textContent=st.tok+' 🎟️';$('debt').textContent=Math.floor(st.debt);$('rank').textContent=R[st.rank-1].n+(st.relic?' 👑':'');$('rankCost').textContent=R[st.rank]?.c||'MAX';$('tax').textContent=st.tax+'s';$('rate').textContent=Math.floor(st.rate);$('pledgeN').textContent=st.pledge+'G';$('qCount').textContent=st.prod.length+'/3';$('storageN').textContent=slotsUsed()+'/'+st.lim;$('unfreeze').classList.toggle('hidden',st.frozen===0);$('fPct').textContent=st.fActive?'100%':Math.floor(st.frenzy)+'%';$('fFill').style.width=(st.fActive?st.fTimer/20*100:st.frenzy)+'%';$('fLabel').textContent=st.fActive?'🔥 BULL RUN · '+st.fTimer+'s':'⚡ FRENESÍ';$('topic').textContent=mem.topic.toUpperCase();$('audit').style.display=st.audit&&ob.full?'flex':'none';$('auditT').textContent=st.auditT;$('sniper').style.display=st.sniper&&ob.full?'flex':'none';$('sniperT').textContent=st.sniperT;$('sniperText').textContent=st.sQty+'x '+S[st.sType].n+' por '+st.sPrice+'G';const grid=$('slots');grid.innerHTML='';let used=0;st.inv.forEach(it=>{const n=it.type==='waste'?1:S[it.type].s;for(let i=0;i<n&&used<st.lim;i++){grid.innerHTML+='<div class="slot on">'+(i===0?(it.type==='waste'?'🗑️':S[it.type].i):'▪')+'</div>';used++}});for(let i=0;i<st.frozen&&used<st.lim;i++){grid.innerHTML+='<div class="slot lock">🔒</div>';used++}while(used<st.lim){grid.innerHTML+='<div class="slot"></div>';used++}const inv=$('inventory');inv.innerHTML=st.inv.length?'':'<div class="muted">Almacén vacío.</div>';st.inv.forEach((it,i)=>{inv.innerHTML+='<div class="inv-row"><span>'+(it.type==='waste'?'🗑️ Desecho':S[it.type].i+' '+S[it.type].n)+'</span><span>'+(it.type==='waste'?'':Math.floor(it.q)+'%')+'</span><button onclick="st.inv.splice('+i+',1);render()">Tirar</button></div>'});$('myOrders').innerHTML=st.orders.length?st.orders.map(o=>(o.side==='buy'?'🟢':'🔴')+' '+o.q+'x '+S[o.type].n+' @ '+o.p).join('<br>'):'Sin órdenes abiertas.';$('contractList').innerHTML=st.contracts.length?st.contracts.map((c,i)=>'<div class="item"><div class="row"><span>'+c.req.map(r=>r.q+'x '+S[r.type].i).join(' + ')+' · '+c.r+'s</span><button class="green" onclick="deliver('+i+')">Entregar +'+c.g+'G +'+c.t+'🎟️</button></div></div>').join(''):'<div class="muted">Sin contratos.</div>';$('caravan').textContent=st.caravan?'Ruta activa ('+st.caravan.r+'s)':'Puerto OK';renderBook()}setInterval(()=>{st.tax--;if(st.tax<=0){st.tax=60;if(ob.full){const m=R[st.rank-1].t*(st.relic?.5:1);st.g-=Math.floor(st.taxRate*m);if(st.g<0)st.frozen=Math.min(st.lim,st.frozen+2)}}if(st.debt>0)st.debt+=.35;if(st.pledge>0)st.g+=Math.floor(st.pledge*.02);if(st.fActive){st.fTimer--;if(st.fTimer<=0){st.fActive=false;st.frenzy=0}}else st.frenzy=Math.max(0,st.frenzy-.5);st.rate=Math.max(14,Math.min(42,st.rate+(Math.random()-.48)*1.5));for(let i=st.prod.length-1;i>=0;i--){const p=st.prod[i];p.r-=st.fActive?2:1;const id=p.type==='tomato'?'pTomato':p.type==='egg'?'pEgg':'pWood';$(id).style.width=((p.total-p.r)/p.total*100)+'%';if(p.r<=0){if(slotsUsed()+S[p.type].s<=st.lim)st.inv.push({type:p.type,q:100});st.prod.splice(i,1);$(id).style.width='0%';if(p.type==='tomato'&&ob.step===2&&!ob.ready){ob.ready=true;guide('💰 TU TOMATE ESTÁ LISTO','Ya invertiste 12G. Ahora conviértelo otra vez en dinero.','Paso 2 · Vende tu primer tomate.','💰 VENDER MI TOMATE')}}}for(let i=st.proc.length-1;i>=0;i--){const p=st.proc[i];p.r-=st.fActive?2:1;$('pSauce').style.width=((p.total-p.r)/p.total*100)+'%';if(p.r<=0){if(p.over&&Math.random()<.25)st.inv.push({type:'waste',q:0});else if(slotsUsed()+1<=st.lim)st.inv.push({type:'sauce',q:100});st.proc.splice(i,1);$('pSauce').style.width='0%'}}st.inv.forEach(it=>{if(it.type==='waste')return;const d=S[it.type].x;if(d>0){it.q-=d*.25;if(it.q<=0){it.type='waste';it.q=0}}});if(ob.market&&Math.random()<.08)bot(Math.random()<.55?mem.topic:['tomates','vales','madera','deuda','general'][Math.floor(Math.random()*5)]);if(ob.full&&!st.sniper&&Math.random()<.04){st.sniper=true;st.sniperT=4;st.sType=Math.random()<.5?'wood':'egg';st.sQty=Math.floor(Math.random()*3)+2;st.sPrice=35}if(st.sniper){st.sniperT--;if(st.sniperT<=0)st.sniper=false}if(ob.full&&!st.audit&&Math.random()<.008){st.audit=true;st.auditT=10}if(st.audit){st.auditT--;if(st.auditT<=0){st.audit=false;if(st.g>=20)st.g-=20;else st.frozen=Math.min(st.lim,st.frozen+1)}}if(st.caravan){st.caravan.r--;if(st.caravan.r<=0){if(Math.random()<=st.caravan.s){const rw=Math.floor(st.caravan.v*st.caravan.m);st.g+=rw;chat('PUERTO','consorcio','💰 Convoy volvió con +'+rw+'G.')}else chat('PUERTO','baron','❌ Un convoy naufragó.');st.caravan=null}}for(let i=st.orders.length-1;i>=0;i--){const o=st.orders[i];if(Math.random()<(st.fActive?.4:.12)){if(o.side==='sell')st.g+=o.p*o.q;else for(let n=0;n<o.q;n++)st.inv.push({type:o.type,q:100});const list=o.side==='buy'?st.book[o.type].bids:st.book[o.type].asks;const k=list.findIndex(x=>x.b==='TÚ'&&x.p===o.p);if(k>=0)list.splice(k,1);st.orders.splice(i,1);frenzy(5)}}for(let i=st.contracts.length-1;i>=0;i--){st.contracts[i].r--;if(st.contracts[i].r<=0)st.contracts.splice(i,1)}if(ob.work&&!st.contracts.length&&Math.random()<.14)st.contracts.push({req:[{type:'tomato',q:2},{type:'sauce',q:1}],g:80,t:4,r:35});render()},1000);chat('HERALDO','consorcio','La plaza está activa. Primero aprende el ciclo básico.');render();</script></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caja Negra Lab — EcoV1 Master Onboarding</title>
+
+  <style>
+    :root {
+      --bg:#020306;
+      --card:#060a10;
+      --card-alt:#0c121c;
+      --border:#141c28;
+      --border-lit:#26354a;
+      --text:#c9d1d9;
+      --text-dim:#6e7681;
+      --gold:#f1e05a;
+      --green:#2ea043;
+      --red:#f85149;
+      --cyan:#58a6ff;
+      --purple:#bc8cff;
+      --orange:#ffa657;
+      --flash:#ff0055;
+    }
+
+    * {
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+    }
+
+    body {
+      background:var(--bg);
+      color:var(--text);
+      padding:8px;
+      font-size:11px;
+      user-select:none;
+    }
+
+    .hidden { display:none !important; }
+
+    .hud {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(95px,1fr));
+      gap:6px;
+      margin-bottom:8px;
+    }
+
+    .hud-box {
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:4px;
+      padding:6px;
+    }
+
+    .hud-label {
+      font-size:8px;
+      text-transform:uppercase;
+      color:var(--text-dim);
+      font-weight:bold;
+    }
+
+    .hud-val {
+      font-size:14px;
+      font-weight:800;
+      color:var(--gold);
+      margin-top:1px;
+    }
+
+    .onboarding {
+      background:linear-gradient(180deg,rgba(241,224,90,.12),rgba(241,224,90,.03));
+      border:1px solid var(--gold);
+      border-radius:6px;
+      padding:10px;
+      margin-bottom:8px;
+      box-shadow:0 0 20px rgba(241,224,90,.08);
+    }
+
+    .onboarding h2 {
+      color:var(--gold);
+      font-size:13px;
+      margin-bottom:4px;
+    }
+
+    .onboarding p {
+      font-size:10px;
+      line-height:1.4;
+      margin:2px 0;
+    }
+
+    .onboarding .step {
+      font-size:9px;
+      color:var(--text-dim);
+      margin-top:4px;
+    }
+
+    .onboarding button {
+      width:100%;
+      padding:8px;
+      margin-top:7px;
+      font-size:11px;
+    }
+
+    .focus-panel {
+      border-color:var(--gold) !important;
+      box-shadow:0 0 18px rgba(241,224,90,.16);
+    }
+
+    .unlock-toast {
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:#0c121c;
+      border:1px solid var(--gold);
+      color:#fff;
+      padding:9px 12px;
+      border-radius:6px;
+      z-index:99999;
+      max-width:90vw;
+      text-align:center;
+      box-shadow:0 12px 30px rgba(0,0,0,.5);
+      font-size:10px;
+    }
+
+    .frenzy-container {
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:4px;
+      padding:5px 8px;
+      margin-bottom:8px;
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+
+    .frenzy-header {
+      display:flex;
+      justify-content:space-between;
+      font-size:9px;
+      font-weight:bold;
+      color:var(--gold);
+    }
+
+    .frenzy-track {
+      height:5px;
+      background:#161b26;
+      border-radius:3px;
+      overflow:hidden;
+    }
+
+    .frenzy-fill {
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--gold),var(--flash));
+      transition:width .2s ease;
+    }
+
+    .frenzy-active {
+      animation:border-glow .4s infinite alternate;
+      border-color:var(--flash) !important;
+    }
+
+    @keyframes border-glow {
+      from { box-shadow:0 0 4px var(--flash); }
+      to { box-shadow:0 0 14px var(--gold); }
+    }
+
+    .sniper-alert,
+    .audit-alert {
+      display:none;
+      color:#fff;
+      padding:5px 8px;
+      border-radius:4px;
+      margin-bottom:8px;
+      justify-content:space-between;
+      align-items:center;
+      animation:pulse .5s infinite alternate;
+    }
+
+    .sniper-alert {
+      background:rgba(255,0,85,.15);
+      border:2px solid var(--flash);
+    }
+
+    .audit-alert {
+      background:rgba(248,81,73,.15);
+      border:2px solid var(--red);
+    }
+
+    @keyframes pulse {
+      from { opacity:1; }
+      to { opacity:.72; }
+    }
+
+    .ticker {
+      background:rgba(88,166,255,.05);
+      border:1px solid var(--cyan);
+      color:var(--cyan);
+      padding:4px 8px;
+      border-radius:4px;
+      margin-bottom:8px;
+      font-size:10px;
+      display:flex;
+      justify-content:space-between;
+    }
+
+    .layout {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:8px;
+    }
+
+    @media (min-width:1200px) {
+      .layout { grid-template-columns:310px 1fr 340px; }
+    }
+
+    .panel {
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:4px;
+      padding:8px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .panel-header {
+      font-size:10px;
+      font-weight:800;
+      text-transform:uppercase;
+      color:var(--cyan);
+      border-bottom:1px solid var(--border);
+      padding-bottom:4px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+    }
+
+    button {
+      background:var(--card-alt);
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:4px 6px;
+      border-radius:3px;
+      cursor:pointer;
+      font-size:10px;
+      font-weight:700;
+    }
+
+    button:hover { background:var(--border-lit); }
+    button:active { transform:scale(.96); }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+
+    button.btn-green { background:#1b4725; border-color:var(--green); color:#7ee787; }
+    button.btn-red { background:#4c1d1a; border-color:var(--red); color:#ff7b72; }
+    button.btn-gold { background:#4a3e14; border-color:var(--gold); color:#fff; }
+    button.btn-purple { background:#381a4c; border-color:var(--purple); color:#d2a8ff; }
+    button.btn-orange { background:#4a2810; border-color:var(--orange); color:#ffc680; }
+    button.btn-flash { background:var(--flash); border-color:#fff; color:#fff; }
+
+    .progress-track {
+      height:3px;
+      background:#161e2b;
+      border-radius:2px;
+      overflow:hidden;
+      margin:3px 0;
+    }
+
+    .progress-fill {
+      height:100%;
+      background:var(--cyan);
+      width:0%;
+    }
+
+    .book-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:6px;
+      font-size:10px;
+    }
+
+    .book-side {
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .book-entry {
+      display:flex;
+      justify-content:space-between;
+      padding:2px 4px;
+      border-radius:2px;
+      cursor:pointer;
+      background:rgba(255,255,255,.02);
+    }
+
+    .book-ask { color:#ff7b72; border-left:2px solid var(--red); }
+    .book-bid { color:#7ee787; border-left:2px solid var(--green); }
+
+    .slots-visual-grid {
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:4px;
+      margin-bottom:4px;
+    }
+
+    .slot-cell {
+      height:26px;
+      background:#070a0e;
+      border:1px dashed var(--border);
+      border-radius:3px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+    }
+
+    .slot-cell.occupied {
+      border-style:solid;
+      border-color:var(--border-lit);
+      background:var(--card-alt);
+    }
+
+    .slot-cell.frozen {
+      border-color:var(--red);
+      background:rgba(248,81,73,.1);
+      color:var(--red);
+    }
+
+    .inv-row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:6px;
+      padding:4px;
+      background:var(--card-alt);
+      border:1px solid var(--border);
+      border-radius:3px;
+      font-size:10px;
+    }
+
+    .chat-box {
+      height:160px;
+      overflow-y:auto;
+      background:#020305;
+      border:1px solid var(--border);
+      border-radius:3px;
+      padding:5px;
+      font-size:9.5px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .chat-msg {
+      padding:2px 4px;
+      border-radius:2px;
+      background:rgba(255,255,255,.01);
+      line-height:1.3;
+    }
+
+    .chat-author-player { color:var(--gold); font-weight:bold; }
+    .chat-author-baron { color:var(--red); font-weight:bold; }
+    .chat-author-traidor { color:var(--purple); font-weight:bold; }
+    .chat-author-consorcio { color:var(--cyan); font-weight:bold; }
+    .chat-author-retail { color:var(--green); font-weight:bold; }
+    .chat-author-random { color:var(--orange); font-weight:bold; }
+
+    .log-container {
+      height:85px;
+      overflow-y:auto;
+      background:#020305;
+      border:1px solid var(--border);
+      border-radius:3px;
+      padding:4px;
+      font-size:8.5px;
+      color:var(--text-dim);
+    }
+
+    .log-item {
+      margin-bottom:2px;
+      border-left:2px solid var(--border);
+      padding-left:3px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="audit-banner" class="audit-alert">
+    <span>⚖️ <b>¡INSPECCIÓN FISCAL SORPRESA!</b> Cuadra tus cuentas o paga contable.</span>
+    <button class="btn-red" onclick="resolveAudit()">PAGAR CONTABLE (30G - <span id="audit-timer">10</span>s)</button>
+  </div>
+
+  <div id="sniper-banner" class="sniper-alert">
+    <span>🚨 <b>¡FAT-FINGER BOT EN BANCARROTA!</b> <span id="sniper-text">Lote 75% OFF</span></span>
+    <button class="btn-flash" onclick="executeSniping()">SNIPE YA (<span id="sniper-timer">4</span>s)</button>
+  </div>
+
+  <div class="onboarding" id="onboarding">
+    <h2 id="ob-title">🎯 TU PRIMER NEGOCIO</h2>
+    <p id="ob-text">Tienes <b>100 Oro</b>. Primero aprende una sola cosa: producir algo y convertirlo otra vez en dinero.</p>
+    <div class="step" id="ob-step">Paso 1 · Produce 1 tomate.</div>
+    <button class="btn-green" id="ob-btn" onclick="onboardingAction()">🍅 PRODUCIR 1 TOMATE · 12G</button>
+  </div>
+
+  <div class="frenzy-container hidden" id="frenzy-box">
+    <div class="frenzy-header">
+      <span id="frenzy-label">⚡ MODO FRENESÍ (BULL RUN COMERCIAL)</span>
+      <span id="frenzy-percent">0%</span>
+    </div>
+    <div class="frenzy-track">
+      <div class="frenzy-fill" id="frenzy-fill"></div>
+    </div>
+  </div>
+
+  <div class="hud">
+    <div class="hud-box" id="hudbox-gold">
+      <div class="hud-label">Oro Líquido</div>
+      <div class="hud-val" id="hud-gold">100</div>
+    </div>
+
+    <div class="hud-box hidden" id="hudbox-tokens">
+      <div class="hud-label">Vales Forex</div>
+      <div class="hud-val" id="hud-tokens" style="color:var(--orange)">0 🎟️</div>
+    </div>
+
+    <div class="hud-box" id="hudbox-networth">
+      <div class="hud-label">Patrimonio</div>
+      <div class="hud-val" id="hud-networth">100</div>
+    </div>
+
+    <div class="hud-box hidden" id="hudbox-rank">
+      <div class="hud-label">Rango / Estatus</div>
+      <div class="hud-val" id="hud-rank" style="color:var(--purple);font-size:10px">I: Aprendiz</div>
+    </div>
+
+    <div class="hud-box hidden" id="hudbox-debt">
+      <div class="hud-label">Deuda Total</div>
+      <div class="hud-val" id="hud-debt" style="color:var(--red)">0 Oro</div>
+    </div>
+
+    <div class="hud-box hidden" id="hudbox-tax">
+      <div class="hud-label">Cierre Fiscal</div>
+      <div class="hud-val" id="hud-tax" style="color:var(--gold)">60s (-15)</div>
+    </div>
+  </div>
+
+  <div class="ticker hidden" id="ticker">
+    <span><b>SEÑAL MACRO:</b> <span id="news-text">Canales de suministro estables.</span></span>
+    <span id="news-countdown">--</span>
+  </div>
+
+  <div class="layout">
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="panel" id="panel-production">
+        <div class="panel-header">
+          <span>Producción</span>
+          <span id="prod-slots-hud">0/3</span>
+        </div>
+
+        <div id="prod-tomato" style="background:var(--card-alt);padding:5px;border-radius:3px;border:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between">
+            <b>🍅 Tomate (1 slot)</b>
+            <span style="color:var(--text-dim)">40s | Coste: 12</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="fill-tomato"></div></div>
+          <div style="display:flex;gap:3px;margin-top:3px">
+            <button style="flex:1" onclick="queueProduction('tomato',1)">1x (12)</button>
+            <button style="flex:1" onclick="queueProduction('tomato',3)">3x (36)</button>
+          </div>
+        </div>
+
+        <div id="prod-egg" class="hidden" style="background:var(--card-alt);padding:5px;border-radius:3px;border:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between">
+            <b>🥚 Huevo (2 slots)</b>
+            <span style="color:var(--text-dim)">110s | Coste: 45</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="fill-egg"></div></div>
+          <div style="display:flex;gap:3px;margin-top:3px">
+            <button style="flex:1" onclick="queueProduction('egg',1)">1x (45)</button>
+            <button style="flex:1" onclick="queueProduction('egg',2)">2x (90)</button>
+          </div>
+        </div>
+
+        <div id="prod-wood" class="hidden" style="background:var(--card-alt);padding:5px;border-radius:3px;border:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between">
+            <b>🪵 Madera (5 slots)</b>
+            <span style="color:var(--text-dim)">310s | Coste: 140</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="fill-wood"></div></div>
+          <button style="width:100%;margin-top:3px" onclick="queueProduction('wood',1)">1x (140)</button>
+        </div>
+      </div>
+
+      <div class="panel hidden" id="panel-workshop">
+        <div class="panel-header">Taller & Overdrive</div>
+        <div style="background:var(--card-alt);padding:4px;border-radius:3px;border:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between">
+            <b>🥫 Salsa (90s)</b>
+            <span style="color:var(--gold)">3 🍅 + 15G</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="fill-sauce"></div></div>
+          <div style="display:flex;gap:3px;margin-top:3px">
+            <button style="flex:1" class="btn-gold" onclick="startProcessing('sauce',false)">Normal (90s)</button>
+            <button style="flex:1" class="btn-flash" onclick="startProcessing('sauce',true)">⚡ Overdrive (15s)</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:3px">
+          <button style="flex:1" class="btn-purple" onclick="pawnWood()">Empeñar Madera (+95G)</button>
+          <button style="flex:1" class="btn-green" onclick="redeemWood()">Rescatar (115G)</button>
+        </div>
+      </div>
+
+      <div class="panel hidden" id="panel-pledge">
+        <div class="panel-header"><span>Fondo Gremial</span><span id="pledge-status">0G</span></div>
+        <div style="font-size:9px;color:var(--text-dim)">Paga +2G/segundo por cada 100G invertidos.</div>
+        <div style="display:flex;gap:3px">
+          <button style="flex:1" class="btn-gold" onclick="investPledge(100)">Invertir 100G</button>
+          <button style="flex:1" class="btn-purple" onclick="withdrawPledge()">Retirar Fondo</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="panel hidden" id="panel-forex" style="border-color:var(--orange)">
+        <div class="panel-header" style="color:var(--orange)"><span>Mercado Cambiario: Vales</span><span>1 🎟️ = <b id="token-rate">24</b> Oro</span></div>
+        <div style="display:flex;gap:3px">
+          <button class="btn-orange" style="flex:1" onclick="exchangeTokens('buy')">Comprar 1 🎟️</button>
+          <button class="btn-gold" style="flex:1" onclick="exchangeTokens('sell')">Liquidar 1 🎟️</button>
+        </div>
+      </div>
+
+      <div class="panel hidden" id="panel-market">
+        <div class="panel-header">
+          <span>Libro de Órdenes</span>
+          <select id="market-view" onchange="renderOrderBook()" style="background:var(--bg);color:var(--text);border:1px solid var(--border);font-size:9px">
+            <option value="tomato">🍅 Tomates</option><option value="egg">🥚 Huevos</option><option value="wood">🪵 Madera</option><option value="sauce">🥫 Salsa</option>
+          </select>
+        </div>
+        <div class="book-grid">
+          <div><div style="color:var(--red);font-weight:bold;font-size:8px">ASKS (Venta)</div><div class="book-side" id="book-asks"></div></div>
+          <div><div style="color:var(--green);font-weight:bold;font-size:8px">BIDS (Compra)</div><div class="book-side" id="book-bids"></div></div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:4px;display:flex;gap:3px">
+          <input type="number" id="order-price" placeholder="Precio" style="background:var(--bg);border:1px solid var(--border);color:#fff;width:58px;font-size:9px">
+          <input type="number" id="order-qty" value="1" style="background:var(--bg);border:1px solid var(--border);color:#fff;width:45px;font-size:9px">
+          <button style="flex:1" class="btn-red" onclick="placeOrder('sell')">Venta</button>
+          <button style="flex:1" class="btn-green" onclick="placeOrder('buy')">Compra</button>
+          <button class="btn-purple" onclick="sweepMarket()">Barrer</button>
+        </div>
+        <div id="my-orders" style="border-top:1px solid var(--border);padding-top:4px"></div>
+      </div>
+
+      <div class="panel hidden" id="panel-social" style="border-color:var(--purple)">
+        <div class="panel-header" style="color:var(--purple)"><span>💬 Plaza Pública</span><span id="chat-activity-badge">Memoria: GENERAL</span></div>
+        <div class="chat-box" id="chat-box"></div>
+        <div style="display:flex;gap:3px">
+          <input type="text" id="chat-input" placeholder="Habla de precios, deuda, madera..." style="flex:1;background:var(--bg);border:1px solid var(--border);color:#fff;padding:4px;font-size:9.5px;border-radius:3px" onkeypress="if(event.key==='Enter')sendPlayerChat()">
+          <button class="btn-gold" onclick="sendPlayerChat()">Enviar</button>
+        </div>
+      </div>
+
+      <div class="panel hidden" id="panel-blackmarket">
+        <div class="panel-header">Mercado Negro & Expediciones</div>
+        <div style="display:flex;gap:3px;flex-wrap:wrap">
+          <button class="btn-purple" onclick="sabotageBot()">Sabotear Bot (25G)</button>
+          <button class="btn-orange" onclick="buySmugglerChest()">Cofre Contrabandista (60G)</button>
+        </div>
+        <div style="font-size:9px;color:var(--text-dim)">Expediciones consumen hasta 4 recursos y tardan 120s.</div>
+        <div style="display:flex;gap:3px">
+          <button style="flex:1" onclick="sendExpedition('safe')">Ruta Segura</button>
+          <button style="flex:1" class="btn-gold" onclick="sendExpedition('pirate')">Pirata</button>
+          <button style="flex:1" class="btn-flash" onclick="sendExpedition('storm')">Tormenta</button>
+        </div>
+        <div id="caravan-status" style="font-size:9px;color:var(--orange)">Puerto OK</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="panel" id="panel-storage">
+        <div class="panel-header"><span>Almacén</span><span id="storage-hud">0/10 Slots</span></div>
+        <div class="slots-visual-grid" id="slots-visual-grid"></div>
+        <div id="inventory-box" style="display:flex;flex-direction:column;gap:2px;max-height:120px;overflow-y:auto"></div>
+        <div style="display:flex;gap:3px">
+          <button id="upgrade-storage-btn" class="hidden" onclick="upgradeStorage()" style="flex:1">Ampliar (+5) [150G]</button>
+          <button id="unfreeze-btn" class="btn-red" style="display:none;flex:1" onclick="unfreezeSlots()">Rescatar (40G)</button>
+        </div>
+      </div>
+
+      <div class="panel hidden" id="panel-finance">
+        <div class="panel-header">Crédito & Prestigio</div>
+        <div style="display:flex;gap:3px"><button class="btn-red" style="flex:1" onclick="requestLoan()">Pedir 150G</button><button class="btn-green" style="flex:1" onclick="payLoan()">Pagar Deuda</button></div>
+        <button class="btn-purple" onclick="buyImperialRelic()">💎 Sello del Barón (450G + 10 🎟️)</button>
+        <button class="btn-gold" onclick="upgradeMerchantRank()">Subir Rango (<span id="rank-cost">300</span> Oro)</button>
+      </div>
+
+      <div class="panel hidden" id="panel-contracts">
+        <div class="panel-header">Contratos</div>
+        <div id="contracts-box"></div>
+      </div>
+
+      <div class="panel hidden" id="panel-log">
+        <div class="panel-header">Registro</div>
+        <div class="log-container" id="log-feed"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+function playSound(type){
+  if(audioCtx.state==='suspended')audioCtx.resume();
+  const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.connect(gain);gain.connect(audioCtx.destination);
+  const now=audioCtx.currentTime;
+  if(type==='coin'){osc.type='triangle';osc.frequency.setValueAtTime(988,now);osc.frequency.setValueAtTime(1319,now+.08);gain.gain.setValueAtTime(.18,now);gain.gain.exponentialRampToValueAtTime(.01,now+.25);osc.start(now);osc.stop(now+.25)}
+  else if(type==='buy'){osc.frequency.setValueAtTime(440,now);osc.frequency.setValueAtTime(554,now+.05);gain.gain.setValueAtTime(.12,now);gain.gain.exponentialRampToValueAtTime(.01,now+.15);osc.start(now);osc.stop(now+.15)}
+  else if(type==='alert'){osc.type='sawtooth';osc.frequency.setValueAtTime(300,now);osc.frequency.linearRampToValueAtTime(150,now+.2);gain.gain.setValueAtTime(.18,now);gain.gain.exponentialRampToValueAtTime(.01,now+.2);osc.start(now);osc.stop(now+.2)}
+  else if(type==='jackpot'){[523,659,784,1047].forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.setValueAtTime(f,now+i*.08);g.gain.setValueAtTime(.16,now+i*.08);g.gain.exponentialRampToValueAtTime(.01,now+i*.08+.15);o.start(now+i*.08);o.stop(now+i*.08+.15)})}
+}
+
+const SPECS={
+ tomato:{cost:12,dur:40,slots:1,decay:1.6,name:'Tomate',icon:'🍅'},
+ egg:{cost:45,dur:110,slots:2,decay:.5,name:'Huevo',icon:'🥚'},
+ wood:{cost:140,dur:310,slots:5,decay:0,name:'Madera',icon:'🪵'},
+ sauce:{cost:15,dur:90,slots:1,decay:0,name:'Salsa',icon:'🥫'}
+};
+const RANKS=[{name:'I: Aprendiz',cost:300,taxMod:1},{name:'II: Comerciante',cost:800,taxMod:.8},{name:'III: Magnate Local',cost:2000,taxMod:.6}];
+
+const state={
+ gold:100,tokens:0,tokenRate:24,debt:0,rank:1,hasImperialRelic:false,taxImmunityTimer:0,storageLimit:10,
+ frozenSlots:0,taxClock:60,taxRate:15,inventory:[],productionQueue:[],userOrders:[],caravan:null,processingQueue:[],
+ pawnedWood:0,pawnTimer:0,pledgedGold:0,frenzyScore:0,frenzyActive:false,frenzyTimer:0,audit:{active:false,timer:10},
+ recentPlayerMessages:0,sniper:{active:false,type:'wood',qty:3,price:90,timer:4},
+ book:{
+  tomato:{asks:[{price:16,qty:12,bot:'Barón_Rojo'}],bids:[{price:11,qty:8,bot:'Traidor_01'}]},
+  egg:{asks:[{price:52,qty:4,bot:'Consorcio'}],bids:[{price:41,qty:6,bot:'Barón_Rojo'}]},
+  wood:{asks:[{price:190,qty:2,bot:'Consorcio'}],bids:[{price:145,qty:4,bot:'Bot_Delta'}]},
+  sauce:{asks:[{price:85,qty:2,bot:'Consorcio'}],bids:[{price:68,qty:3,bot:'Barón_Rojo'}]}
+ },
+ news:{text:'Canales de suministro estables.',timer:0},contracts:[]
+};
+
+const botMemory={
+ lastTopic:'general',recentLines:[],
+ threads:{
+  tomates:[
+   {author:'Barón_Rojo',cls:'chat-author-baron',text:'El tomate está flojo hoy. Yo no produciría sin mirar el bid.'},
+   {author:'Traidor_01',cls:'chat-author-traidor',text:'Hay margen si compras barato, pero no te cases con el inventario.'},
+   {author:'Bot_Scrap',cls:'chat-author-retail',text:'Mis tomates están perdiendo calidad. Vendo antes de comerme el desecho.'}
+  ],
+  vales:[
+   {author:'Consorcio',cls:'chat-author-consorcio',text:'La paridad de Vales sigue cerca de su rango normal.'},
+   {author:'Especulador_X',cls:'chat-author-random',text:'Yo liquidé Vales para tener Oro listo por si aparece un snipe.'}
+  ],
+  madera:[
+   {author:'Consorcio',cls:'chat-author-consorcio',text:'La madera tarda mucho; quien la produce está inmovilizando capital.'},
+   {author:'Barón_Rojo',cls:'chat-author-baron',text:'La madera paga bien si sabes esperar.'}
+  ],
+  deuda:[
+   {author:'Traidor_01',cls:'chat-author-traidor',text:'El crédito da velocidad, pero te come las ventas si te endeudas demasiado.'},
+   {author:'Bot_Scrap',cls:'chat-author-retail',text:'Yo no pediría préstamo sin tener una salida clara.'}
+  ],
+  quiebra:[
+   {author:'Barón_Rojo',cls:'chat-author-baron',text:'Eso ya huele a quiebra. Guarda liquidez.'},
+   {author:'Traidor_01',cls:'chat-author-traidor',text:'El mercado castiga al que se queda sin Oro en el peor momento.'}
+  ],
+  general:[
+   {author:'Sombra_09',cls:'chat-author-random',text:'¿Qué margen están buscando hoy?'},
+   {author:'Barón_Rojo',cls:'chat-author-baron',text:'Yo miro liquidez antes que cantidad.'}
+  ]
+ }
+};
+
+const onboarding={step:1,firstTomatoReady:false,firstSale:false,marketUnlocked:false,workshopUnlocked:false,financeUnlocked:false,fullUnlocked:false};
+
+function el(id){return document.getElementById(id)}
+function log(msg){const f=el('log-feed');const r=document.createElement('div');r.className='log-item';r.textContent=`[${new Date().toLocaleTimeString().slice(3)}] ${msg}`;f.prepend(r);if(typeof toast==='function')toast(msg)}
+function toast(msg){document.querySelector('.unlock-toast')?.remove();const d=document.createElement('div');d.className='unlock-toast';d.innerHTML=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),2500)}
+function setOB(title,text,step,btn,disabled=false){el('ob-title').innerHTML=title;el('ob-text').innerHTML=text;el('ob-step').textContent=step;el('ob-btn').innerHTML=btn;el('ob-btn').disabled=disabled}
+function reveal(id){el(id)?.classList.remove('hidden')} function hide(id){el(id)?.classList.add('hidden')}
+function focus(id){document.querySelectorAll('.focused').forEach(x=>x.classList.remove('focused'));el(id)?.classList.add('focused')}
+
+function pushChatMessage(author,cls,text){
+ if(botMemory.recentLines.includes(text))return;
+ botMemory.recentLines.push(text);if(botMemory.recentLines.length>15)botMemory.recentLines.shift();
+ const box=el('chat-box'),m=document.createElement('div');m.className='chat-msg';m.innerHTML=`<span class="${cls}">[${author}]:</span> ${text}`;box.appendChild(m);box.scrollTop=box.scrollHeight;if(box.childNodes.length>35)box.removeChild(box.firstChild)
+}
+function triggerContextualThread(topic){
+ botMemory.lastTopic=topic;const lines=botMemory.threads[topic]||botMemory.threads.general;
+ let d=0;lines.forEach(line=>{setTimeout(()=>pushChatMessage(line.author,line.cls,line.text),d);d+=900+Math.random()*900})
+}
+function parsePlayerSemanticsWithMemory(text){
+ const lower=text.toLowerCase();let topic=botMemory.lastTopic||'general';
+ if(lower.includes('tomate')||lower.includes('salsa'))topic='tomates';
+ else if(lower.includes('vale')||lower.includes('token')||lower.includes('oro'))topic='vales';
+ else if(lower.includes('madera')||lower.includes('almac'))topic='madera';
+ else if(lower.includes('deuda')||lower.includes('banco')||lower.includes('prest'))topic='deuda';
+ botMemory.lastTopic=topic;
+ setTimeout(()=>{const lines=botMemory.threads[topic]||botMemory.threads.general;const available=lines.filter(l=>!botMemory.recentLines.includes(l.text));const pool=available.length?available:lines;const pick=pool[Math.floor(Math.random()*pool.length)];pushChatMessage(pick.author,pick.cls,pick.text)},900)
+}
+function sendPlayerChat(){const i=el('chat-input'),v=i.value.trim();if(!v)return;pushChatMessage('TÚ','chat-author-player',v);i.value='';state.recentPlayerMessages+=4;parsePlayerSemanticsWithMemory(v)}
+
+function getOccupiedSlots(){return state.inventory.reduce((a,i)=>a+(i.type==='waste'?1:SPECS[i.type].slots),0)+state.frozenSlots}
+function renderSlotsGrid(){
+ const g=el('slots-visual-grid');g.innerHTML='';let rendered=0;
+ state.inventory.forEach(item=>{const n=item.type==='waste'?1:SPECS[item.type].slots,icon=item.type==='waste'?'🗑️':SPECS[item.type].icon;for(let s=0;s<n&&rendered<state.storageLimit;s++){g.innerHTML+=`<div class="slot-cell occupied">${s===0?icon:'▪'}</div>`;rendered++}});
+ for(let f=0;f<state.frozenSlots&&rendered<state.storageLimit;f++){g.innerHTML+='<div class="slot-cell frozen">🔒</div>';rendered++}
+ while(rendered<state.storageLimit){g.innerHTML+='<div class="slot-cell"></div>';rendered++}
+}
+function renderOrderBook(){
+ const type=el('market-view').value,b=state.book[type];
+ el('book-asks').innerHTML='';b.asks.slice().sort((a,z)=>a.price-z.price).forEach(a=>{const real=state.book[type].asks.indexOf(a);el('book-asks').innerHTML+=`<div class="book-entry book-ask" onclick="fillAsk('${type}',${real})"><span>${a.price}G</span><span>${a.qty}x <small>(${a.bot})</small></span></div>`});
+ el('book-bids').innerHTML='';b.bids.slice().sort((a,z)=>z.price-a.price).forEach(bi=>{const real=state.book[type].bids.indexOf(bi);el('book-bids').innerHTML+=`<div class="book-entry book-bid" onclick="fillBid('${type}',${real})"><span>${bi.price}G</span><span>${bi.qty}x <small>(${bi.bot})</small></span></div>`});
+}
+function updateUI(){
+ el('hud-gold').textContent=Math.floor(state.gold);el('hud-tokens').textContent=`${state.tokens} 🎟️`;el('token-rate').textContent=Math.floor(state.tokenRate);el('hud-debt').textContent=`${Math.floor(state.debt)} Oro`;
+ const taxMod=RANKS[state.rank-1].taxMod*(state.hasImperialRelic?.5:1);
+ el('hud-tax').textContent=state.taxImmunityTimer>0?`Inmune (${state.taxImmunityTimer}s)`:`${state.taxClock}s (-${Math.floor(state.taxRate*taxMod)})`;
+ el('hud-rank').textContent=`${RANKS[state.rank-1].name}${state.hasImperialRelic?' 👑':''}`;el('rank-cost').textContent=RANKS[state.rank]?.cost||'MAX';el('pledge-status').textContent=`${state.pledgedGold}G`;
+ el('storage-hud').textContent=`${getOccupiedSlots()}/${state.storageLimit}${state.frozenSlots?` (${state.frozenSlots} Bloq)`:''}`;el('prod-slots-hud').textContent=`${state.productionQueue.length}/3`;el('unfreeze-btn').style.display=state.frozenSlots?'block':'none';
+ el('audit-banner').style.display=(state.audit.active&&onboarding.fullUnlocked)?'flex':'none';el('audit-timer').textContent=state.audit.timer;
+ el('sniper-banner').style.display=(state.sniper.active&&onboarding.fullUnlocked)?'flex':'none';if(state.sniper.active){el('sniper-text').textContent=`${state.sniper.qty}x ${SPECS[state.sniper.type].name} por ${state.sniper.price} Oro`;el('sniper-timer').textContent=state.sniper.timer}
+ el('chat-activity-badge').textContent=`Memoria: ${botMemory.lastTopic.toUpperCase()}`;
+ renderSlotsGrid();
+ const ff=el('frenzy-fill');if(state.frenzyActive){el('frenzy-box').classList.add('frenzy-active');el('frenzy-label').textContent=`🔥 BULL RUN ACTIVO · ${state.frenzyTimer}s`;el('frenzy-percent').textContent='100%';ff.style.width=`${state.frenzyTimer/20*100}%`}else{el('frenzy-box').classList.remove('frenzy-active');el('frenzy-label').textContent='⚡ MODO FRENESÍ';el('frenzy-percent').textContent=`${Math.floor(state.frenzyScore)}%`;ff.style.width=`${state.frenzyScore}%`}
+ const invWorth=state.inventory.reduce((a,i)=>i.type==='waste'?a:a+(state.book[i.type]?.bids[0]?.price||10)*(i.quality/100),0);
+ el('hud-networth').textContent=Math.floor(state.gold+invWorth+state.tokens*state.tokenRate+state.pledgedGold-state.debt);
+ const ib=el('inventory-box');ib.innerHTML=state.inventory.length?'':'<div style="color:var(--text-dim)">Almacén vacío.</div>';
+ state.inventory.forEach((item,idx)=>{if(item.type==='waste')ib.innerHTML+=`<div class="inv-row"><span>🗑️ Desecho Tóxico</span><button class="btn-red" onclick="cleanWaste(${idx})">Limpiar (-5)</button></div>`;else{const s=SPECS[item.type],q=Math.floor(item.quality);ib.innerHTML+=`<div class="inv-row"><span>${s.icon} ${s.name} (${s.slots}s)</span><span>${s.decay?q+'%':'100%'}</span><button onclick="discardItem(${idx})">Tirar</button></div>`}});
+ const cb=el('contracts-box');cb.innerHTML=state.contracts.length?'':'<div style="color:var(--text-dim)">Sin contratos.</div>';state.contracts.forEach((c,idx)=>{cb.innerHTML+=`<div class="inv-row"><span>🔥 ${c.reqs.map(r=>`${r.qty}x ${SPECS[r.type].icon}`).join(' + ')} · ${c.timer}s</span><button class="btn-green" onclick="deliverContract(${idx})">Entregar +${c.goldReward}G +${c.tokenReward}🎟️</button></div>`});
+ const my=el('my-orders');my.innerHTML=state.userOrders.length?'':'<div style="color:var(--text-dim)">Sin órdenes abiertas.</div>';state.userOrders.forEach((o,idx)=>my.innerHTML+=`<div class="inv-row"><span>${o.side==='buy'?'🟢':'🔴'} ${o.qty}x ${SPECS[o.type].name} @ ${o.price}</span><button onclick="cancelUserOrder(${idx})">X</button></div>`);
+ el('news-text').textContent=state.news.text;el('news-countdown').textContent=state.news.timer>0?`${state.news.timer}s`:'--';el('caravan-status').textContent=state.caravan?`Ruta activa (${state.caravan.timer}s)`:'Puerto OK';
+ renderOrderBook()
+}
+
+function addFrenzy(p){if(state.frenzyActive)return;state.frenzyScore=Math.min(100,state.frenzyScore+p);if(state.frenzyScore>=100){state.frenzyActive=true;state.frenzyTimer=20;playSound('jackpot');pushChatMessage('SISTEMA','chat-author-baron','🔥 ¡Bull Run activado!')}}
+function queueProduction(type,count){
+ const s=SPECS[type];if(state.productionQueue.length+count>3)return log('Máximo 3 producciones.');if(state.gold<s.cost*count)return log('Oro insuficiente.');
+ state.gold-=s.cost*count;for(let i=0;i<count;i++)state.productionQueue.push({type,remaining:s.dur,total:s.dur});playSound('buy');addFrenzy(3);
+ if(type==='tomato'&&onboarding.step===1){onboarding.step=2;setOB('⏳ PRODUCCIÓN EN CURSO','Invertiste <b>12G</b>. Ahora espera a que el tomate termine.','Paso 2 · Espera 40 segundos.','ESPERANDO…',true)}
+ updateUI()
+}
+function fillAsk(type,idx){const a=state.book[type].asks[idx],s=SPECS[type];if(!a)return;if(getOccupiedSlots()+s.slots>state.storageLimit)return log('Almacén lleno.');if(state.gold<a.price)return log('Oro insuficiente.');state.gold-=a.price;a.qty--;state.inventory.push({type,quality:100});if(a.qty<=0)state.book[type].asks.splice(idx,1);playSound('buy');addFrenzy(4);log(`Compraste ${s.name} por ${a.price}G.`);updateUI()}
+function fillBid(type,idx){const b=state.book[type].bids[idx];if(!b)return;const inv=state.inventory.findIndex(i=>i.type===type);if(inv<0)return log(`No tienes ${SPECS[type].name}.`);const item=state.inventory[inv];let payout=Math.floor(b.price*(item.quality/100));if(state.frenzyActive)payout=Math.floor(payout*1.5);if(state.debt>0){const c=Math.floor(payout*.5);state.debt=Math.max(0,state.debt-c);payout-=c}state.gold+=payout;b.qty--;state.inventory.splice(inv,1);if(b.qty<=0)state.book[type].bids.splice(idx,1);playSound('coin');addFrenzy(6);log(`Vendiste ${SPECS[type].name} por ${payout}G.`);
+ if(type==='tomato'&&!onboarding.firstSale){onboarding.firstSale=true;onboarding.step=3;unlockMarket()}
+ updateUI()
+}
+function placeOrder(side){const type=el('market-view').value,price=parseInt(el('order-price').value),qty=parseInt(el('order-qty').value)||1;if(!price||price<=0)return log('Precio inválido.');if(side==='sell'){const avail=state.inventory.filter(i=>i.type===type).length;if(avail<qty)return log('Sin stock.');for(let n=0;n<qty;n++){const i=state.inventory.findIndex(x=>x.type===type);state.inventory.splice(i,1)}state.userOrders.push({side,type,price,qty});state.book[type].asks.push({price,qty,bot:'TÚ'})}else{if(state.gold<price*qty)return log('Oro insuficiente.');state.gold-=price*qty;state.userOrders.push({side,type,price,qty});state.book[type].bids.push({price,qty,bot:'TÚ'})}log(`Orden ${side==='buy'?'de compra':'de venta'} creada.`);updateUI()}
+function cancelUserOrder(idx){const o=state.userOrders[idx];if(o.side==='buy')state.gold+=o.price*o.qty;else for(let i=0;i<o.qty;i++)state.inventory.push({type:o.type,quality:100});const list=o.side==='buy'?state.book[o.type].bids:state.book[o.type].asks;const j=list.findIndex(e=>e.bot==='TÚ'&&e.price===o.price);if(j>=0)list.splice(j,1);state.userOrders.splice(idx,1);log('Orden cancelada.');updateUI()}
+function sweepMarket(){const type=el('market-view').value,asks=state.book[type].asks;if(!asks.length)return log('Sin oferta.');let cost=0,qty=0;asks.forEach(a=>{cost+=a.price*a.qty;qty+=a.qty});if(state.gold<cost)return log(`Necesitas ${cost}G para barrer el mercado.`);if(getOccupiedSlots()+SPECS[type].slots*qty>state.storageLimit)return log('Almacén lleno.');state.gold-=cost;for(let i=0;i<qty;i++)state.inventory.push({type,quality:100});state.book[type].asks=[{price:Math.floor((asks[0]?.price||10)*1.55),qty:5,bot:'Barón_Rojo'}];addFrenzy(20);log(`Barriste ${qty} unidades de ${SPECS[type].name}.`);updateUI()}
+function startProcessing(product,overdrive){if(product!=='sauce')return;const tom=state.inventory.filter(i=>i.type==='tomato').length;if(tom<3||state.gold<15)return log('Requiere 3 Tomates + 15G.');state.gold-=15;let r=0;for(let i=state.inventory.length-1;i>=0&&r<3;i--)if(state.inventory[i].type==='tomato'){state.inventory.splice(i,1);r++}const dur=overdrive?15:90;state.processingQueue.push({type:'sauce',remaining:dur,total:dur,overdrive});addFrenzy(8);log(`Salsa iniciada (${dur}s).`);if(!onboarding.workshopUnlocked){onboarding.workshopUnlocked=true;unlockFinance()}updateUI()}
+function pawnWood(){const i=state.inventory.findIndex(x=>x.type==='wood');if(i<0)return log('Sin Madera.');state.inventory.splice(i,1);state.pawnedWood++;state.pawnTimer=120;state.gold+=95;log('Madera empeñada: +95G.');updateUI()}
+function redeemWood(){if(state.pawnedWood<=0)return log('Sin empeños.');if(state.gold<115)return log('Requiere 115G.');state.gold-=115;state.pawnedWood--;state.inventory.push({type:'wood',quality:100});log('Madera rescatada.');updateUI()}
+function investPledge(a){if(state.gold<a)return log('Oro insuficiente.');state.gold-=a;state.pledgedGold+=a;log(`Invertiste ${a}G en el fondo.`);updateUI()}
+function withdrawPledge(){if(state.pledgedGold<=0)return log('Sin fondo.');state.gold+=state.pledgedGold;log(`Retiraste ${state.pledgedGold}G del fondo.`);state.pledgedGold=0;updateUI()}
+function exchangeTokens(action){if(action==='buy'){if(state.gold<state.tokenRate)return log('Oro insuficiente.');state.gold-=state.tokenRate;state.tokens++;log(`Compraste 1 Vale por ${Math.floor(state.tokenRate)}G.`)}else{if(state.tokens<=0)return log('Sin Vales.');state.tokens--;state.gold+=state.tokenRate;log(`Liquidaste 1 Vale por ${Math.floor(state.tokenRate)}G.`)}addFrenzy(5);updateUI()}
+function requestLoan(){state.gold+=150;state.debt+=175;pushChatMessage('Traidor_01','chat-author-traidor','Ya vi ese préstamo. Ahora tus ventas tienen presión.');log('Préstamo recibido: +150G. Deuda total +175G.');if(!onboarding.fullUnlocked)unlockFull();updateUI()}
+function payLoan(){if(state.debt<=0)return log('No tienes deuda pendiente.');if(state.gold<state.debt){state.debt-=state.gold;state.gold=0}else{state.gold-=state.debt;state.debt=0}log('Pago aplicado a la deuda.');updateUI()}
+function buyImperialRelic(){if(state.hasImperialRelic)return log('Ya tienes el Sello.');if(state.gold<450||state.tokens<10)return log('Requiere 450G y 10 Vales.');state.gold-=450;state.tokens-=10;state.hasImperialRelic=true;playSound('jackpot');log('Sello del Barón adquirido.');updateUI()}
+function upgradeMerchantRank(){if(!RANKS[state.rank])return log('Rango MAX.');const cost=RANKS[state.rank-1].cost;if(state.gold<cost)return log('Oro insuficiente.');state.gold-=cost;state.rank++;log('Rango mejorado.');updateUI()}
+function upgradeStorage(){if(state.gold<150)return log('Requiere 150G.');state.gold-=150;state.storageLimit+=5;log('Almacén ampliado +5 slots.');updateUI()}
+function unfreezeSlots(){if(state.gold<40)return log('Requiere 40G.');state.gold-=40;state.frozenSlots=0;log('Slots rescatados.');updateUI()}
+function cleanWaste(idx){if(state.gold<5)return log('Requiere 5G.');state.gold-=5;state.inventory.splice(idx,1);log('Desecho limpiado.');updateUI()}
+function discardItem(idx){state.inventory.splice(idx,1);log('Objeto descartado.');updateUI()}
+function deliverContract(idx){const c=state.contracts[idx];let ok=true;c.reqs.forEach(r=>{if(state.inventory.filter(i=>i.type===r.type).length<r.qty)ok=false});if(!ok)return log('Faltan recursos.');c.reqs.forEach(r=>{for(let n=0;n<r.qty;n++){const i=state.inventory.findIndex(x=>x.type===r.type);state.inventory.splice(i,1)}});state.gold+=c.goldReward;state.tokens+=c.tokenReward;state.contracts.splice(idx,1);addFrenzy(12);log(`Contrato entregado: +${c.goldReward}G +${c.tokenReward} Vales.`);updateUI()}
+function resolveAudit(){if(!state.audit.active)return log('No hay auditoría activa.');if(state.gold<30)return log('Oro insuficiente.');state.gold-=30;state.audit.active=false;log('Auditoría resuelta por 30G.');updateUI()}
+function executeSniping(){if(!state.sniper.active)return log('La oferta ya expiró.');const s=state.sniper;if(state.gold<s.price)return log('Oro insuficiente.');if(getOccupiedSlots()+SPECS[s.type].slots*s.qty>state.storageLimit)return log('Almacén lleno.');state.gold-=s.price;for(let i=0;i<s.qty;i++)state.inventory.push({type:s.type,quality:100});state.sniper.active=false;addFrenzy(15);playSound('jackpot');log(`Snipe exitoso: ${s.qty}x ${SPECS[s.type].name}.`);updateUI()}
+function sabotageBot(){if(state.gold<25)return log('Requiere 25G.');state.gold-=25;state.book.tomato.bids.unshift({price:28,qty:6,bot:'Traidor_01 (HACKEADO)'});pushChatMessage('Traidor_01','chat-author-traidor','¿Quién tocó mi orden de tomates?');log('Traidor_01 saboteado.');updateUI()}
+function buySmugglerChest(){if(state.gold<60)return log('Requiere 60G.');state.gold-=60;const r=Math.random();if(r<.35){state.tokens+=5;log('Cofre: +5 Vales.')}else if(r<.7){state.inventory.push({type:'wood',quality:100});log('Cofre: +1 Madera.')}else{state.debt+=40;log('Cofre: multa +40 deuda.')}updateUI()}
+function sendExpedition(route){if(state.caravan)return log('Expedición activa.');const goods=state.inventory.filter(i=>i.type!=='waste');if(goods.length<3)return log('Mínimo 3 recursos.');const load=state.inventory.splice(0,Math.min(4,state.inventory.length));const est=load.reduce((a,it)=>a+(state.book[it.type]?.bids[0]?.price||15),0);let success=.95,mult=1.4;if(route==='pirate'){success=.75;mult=2.1}else if(route==='storm'){success=.5;mult=3.8}state.caravan={timer:120,loadValue:est,successRate:success,mult};log('Expedición enviada.');updateUI()}
+
+function unlockMarket(){
+ onboarding.marketUnlocked=true;reveal('panel-market');reveal('panel-social');reveal('panel-log');reveal('prod-egg');reveal('prod-wood');reveal('hudbox-rank');reveal('upgrade-storage-btn');
+ setOB('✅ YA ENTENDISTE LO BÁSICO','Produjiste y vendiste. Ahora puedes comparar precios, colocar órdenes y escuchar a otros traders.','Paso 3 · Aprende el mercado.','🔓 VER TALLER');
+ toast('🔓 Mercado, Chat, Huevo y Madera desbloqueados.');pushChatMessage('HERALDO','chat-author-consorcio','Nuevo comerciante en la plaza: acaba de cerrar su primera venta.')
+}
+function unlockWorkshop(){reveal('panel-workshop');reveal('panel-contracts');setOB('🥫 AÑADE VALOR','El Taller convierte materias primas en productos. Reúne 3 tomates + 15G para fabricar Salsa.','Paso 4 · Transformar puede mejorar el valor.','IR AL TALLER');toast('🔓 Taller y Contratos desbloqueados.')}
+function unlockFinance(){reveal('panel-finance');reveal('panel-forex');reveal('panel-pledge');reveal('hudbox-tokens');reveal('hudbox-debt');reveal('hudbox-tax');setOB('🏦 CAPITAL Y RIESGO','Ya conoces producción, mercado y transformación. Se desbloquean herramientas financieras.','Paso 5 · Crédito, Vales y Fondo Gremial.','CONTINUAR');toast('🔓 Crédito, Vales y Fondo desbloqueados.')}
+function unlockFull(){onboarding.fullUnlocked=true;reveal('frenzy-box');reveal('ticker');reveal('panel-blackmarket');setOB('🌐 MERCADO COMPLETO','Ya tienes las bases. Desde ahora aparecen eventos, Frenesí, señales macro y oportunidades rápidas.','Tutorial terminado · Todas las dinámicas siguen activas.','✓ ENTENDIDO');toast('🔓 Todas las dinámicas están activas.')}
+function onboardingAction(){
+ if(onboarding.step===1){queueProduction('tomato',1);return}
+ if(onboarding.step===2&&onboarding.firstTomatoReady){const bids=state.book.tomato.bids;if(bids.length){let best=0;for(let i=1;i<bids.length;i++)if(bids[i].price>bids[best].price)best=i;fillBid('tomato',best)}return}
+ if(onboarding.step===3){unlockWorkshop();onboarding.step=4;return}
+ if(onboarding.step===4){reveal('panel-finance');reveal('panel-forex');reveal('panel-pledge');reveal('hudbox-tokens');reveal('hudbox-debt');reveal('hudbox-tax');onboarding.step=5;setOB('🏦 CAPITAL Y RIESGO','Ahora puedes probar crédito, Vales y fondo gremial.','Paso 5 · Explora herramientas financieras.','🔓 ACTIVAR MERCADO COMPLETO');toast('🔓 Finanzas desbloqueadas.');return}
+ if(onboarding.step===5){unlockFull();onboarding.step=6;return}
+ if(onboarding.step>=6)hide('onboarding')
+}
+
+setInterval(()=>{
+ state.taxClock--;if(state.taxImmunityTimer>0)state.taxImmunityTimer--;if(state.debt>0)state.debt+=.35;if(state.pledgedGold>0)state.gold+=Math.floor(state.pledgedGold*.02);
+ if(state.taxClock<=0){state.taxClock=60;if(onboarding.fullUnlocked&&state.taxImmunityTimer<=0){const mod=RANKS[state.rank-1].taxMod*(state.hasImperialRelic?.5:1);state.gold-=Math.floor(state.taxRate*mod);if(state.gold<0){state.frozenSlots=Math.min(state.storageLimit,state.frozenSlots+2);botMemory.lastTopic='quiebra';triggerContextualThread('quiebra')}}}
+ if(state.frenzyActive){state.frenzyTimer--;if(state.frenzyTimer<=0){state.frenzyActive=false;state.frenzyScore=0}}else state.frenzyScore=Math.max(0,state.frenzyScore-.5);
+ if(state.recentPlayerMessages>0)state.recentPlayerMessages=Math.max(0,state.recentPlayerMessages-.2);
+ if(Math.random()<Math.max(.04,.22-state.recentPlayerMessages*.04)){const topics=Object.keys(botMemory.threads);const t=Math.random()<.55?botMemory.lastTopic:topics[Math.floor(Math.random()*topics.length)];if(onboarding.marketUnlocked)triggerContextualThread(t)}
+ state.tokenRate=Math.max(14,Math.min(42,state.tokenRate+(Math.random()-.48)*1.5));
+ const speed=state.frenzyActive?2:1;
+ for(let i=state.productionQueue.length-1;i>=0;i--){const p=state.productionQueue[i];p.remaining-=speed;const f=el('fill-'+p.type);if(f)f.style.width=`${((p.total-p.remaining)/p.total)*100}%`;if(p.remaining<=0){if(getOccupiedSlots()+SPECS[p.type].slots<=state.storageLimit)state.inventory.push({type:p.type,quality:100});state.productionQueue.splice(i,1);if(f)f.style.width='0%';if(p.type==='tomato'&&onboarding.step===2&&!onboarding.firstTomatoReady){onboarding.firstTomatoReady=true;setOB('💰 TU TOMATE ESTÁ LISTO','Ya invertiste 12G. Ahora conviértelo otra vez en dinero.','Paso 2 · Vende tu primer tomate.','💰 VENDER MI TOMATE',false)}}}
+ for(let i=state.processingQueue.length-1;i>=0;i--){const p=state.processingQueue[i];p.remaining-=speed;const f=el('fill-sauce');if(f)f.style.width=`${((p.total-p.remaining)/p.total)*100}%`;if(p.remaining<=0){if(p.overdrive&&Math.random()<.25)state.inventory.push({type:'waste',quality:0});else if(getOccupiedSlots()+1<=state.storageLimit)state.inventory.push({type:'sauce',quality:100});state.processingQueue.splice(i,1);if(f)f.style.width='0%'}}
+ state.inventory.forEach(it=>{if(it.type==='waste')return;const d=SPECS[it.type].decay;if(d>0){it.quality-=d*.25;if(it.quality<=0){it.type='waste';it.quality=0}}});
+ if(onboarding.fullUnlocked&&!state.sniper.active&&Math.random()<.04){state.sniper={active:true,type:Math.random()<.5?'wood':'egg',qty:Math.floor(Math.random()*3)+2,price:35,timer:4}}
+ if(state.sniper.active){state.sniper.timer--;if(state.sniper.timer<=0)state.sniper.active=false}
+ if(onboarding.fullUnlocked&&!state.audit.active&&Math.random()<.008){state.audit.active=true;state.audit.timer=10}
+ if(state.audit.active){state.audit.timer--;if(state.audit.timer<=0){state.audit.active=false;if(state.gold>=20)state.gold-=20;else state.frozenSlots=Math.min(state.storageLimit,state.frozenSlots+1)}}
+ if(state.caravan){state.caravan.timer--;if(state.caravan.timer<=0){if(Math.random()<=state.caravan.successRate){const rw=Math.floor(state.caravan.loadValue*state.caravan.mult);state.gold+=rw;pushChatMessage('PUERTO','chat-author-consorcio',`💰 Convoy volvió con +${rw}G.`)}else pushChatMessage('PUERTO','chat-author-baron','❌ Un convoy naufragó.');state.caravan=null}}
+ for(let i=state.userOrders.length-1;i>=0;i--){const o=state.userOrders[i];if(Math.random()<(state.frenzyActive?.4:.12)){if(o.side==='sell')state.gold+=o.price*o.qty;else for(let n=0;n<o.qty;n++)state.inventory.push({type:o.type,quality:100});const list=o.side==='buy'?state.book[o.type].bids:state.book[o.type].asks;const k=list.findIndex(x=>x.bot==='TÚ'&&x.price===o.price);if(k>=0)list.splice(k,1);state.userOrders.splice(i,1);addFrenzy(5)}}
+ for(let i=state.contracts.length-1;i>=0;i--){state.contracts[i].timer--;if(state.contracts[i].timer<=0)state.contracts.splice(i,1)}
+ if(onboarding.workshopUnlocked&&state.contracts.length===0&&Math.random()<.14)state.contracts.push({reqs:[{type:'tomato',qty:2},{type:'sauce',qty:1}],goldReward:80,tokenReward:4,timer:35});
+ updateUI()
+},1000);
+
+pushChatMessage('HERALDO','chat-author-consorcio','La plaza ya está activa. Primero aprende el ciclo básico y luego entrarás al mercado.');
+updateUI();
+</script>
+</body>
+</html>
