@@ -16,39 +16,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Expand snapshot with UTF-8 filenames
+      - name: Rebuild and expand Caja Negra Lab
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          import zipfile
-
-          zip_path = Path('Caja Negra Lab/Caja_Negra_Lab_snapshot.zip')
-          root = Path('.')
-
-          if not zip_path.exists():
-              raise SystemExit('Snapshot ZIP not found')
-
-          with zipfile.ZipFile(zip_path) as z:
-              for info in z.infolist():
-                  raw_name = info.filename
-                  try:
-                      fixed_name = raw_name.encode('cp437').decode('utf-8')
-                  except Exception:
-                      fixed_name = raw_name
-
-                  target = root / fixed_name
-                  if fixed_name.endswith('/'):
-                      target.mkdir(parents=True, exist_ok=True)
-                      continue
-
-                  target.parent.mkdir(parents=True, exist_ok=True)
-                  target.write_bytes(z.read(info))
-
-          zip_path.unlink()
-          marker = Path('Caja Negra Lab/.expand-request')
-          if marker.exists():
-              marker.unlink()
-          PY
+          set -euo pipefail
+          cat .tmp/caja-negra/chunk*.b64 | base64 --decode > /tmp/caja-negra.tar.gz
+          tar -xzf /tmp/caja-negra.tar.gz -C .
+          rm -rf .tmp/caja-negra
+          rm -f 'Caja Negra Lab/Caja_Negra_Lab_snapshot.zip'
+          rm -f 'Caja Negra Lab/.expand-request'
 
       - name: Commit expanded files
         run: |
