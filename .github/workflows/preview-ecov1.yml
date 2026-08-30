@@ -29,6 +29,8 @@ jobs:
         run: |
           mkdir -p _site
           cp prototypes/EcoV1_Bot_Economy_Lab_v1.html _site/index.html
+          cp prototypes/ecov1-ui-v2.css _site/ecov1-ui-v2.css
+          sed -i 's#</head>#<link rel="stylesheet" href="./ecov1-ui-v2.css" /></head>#' _site/index.html
           touch _site/.nojekyll
 
       - name: Setup Pages
@@ -42,5 +44,3 @@ jobs:
       - name: Deploy preview
         id: deployment
         uses: actions/deploy-pages@v4
-
-# Retrigger after allowing ecov1-bots-lab in github-pages environment: 2026-08-30
