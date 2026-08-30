@@ -28,9 +28,7 @@ jobs:
       - name: Build preview site
         run: |
           mkdir -p _site
-          cp prototypes/EcoV1_Bot_Economy_Lab_v1.html _site/index.html
-          cp prototypes/ecov1-ui-v2.css _site/ecov1-ui-v2.css
-          sed -i 's#</head>#<link rel="stylesheet" href="./ecov1-ui-v2.css" /></head>#' _site/index.html
+          cp prototypes/EcoV1_Bot_Economy_Lab_v2.html _site/index.html
           touch _site/.nojekyll
 
       - name: Setup Pages
