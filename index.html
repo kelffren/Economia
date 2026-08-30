@@ -2,98 +2,218 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kelo World — Economía</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#08100d" />
+  <title>Kelo World — Economy Beta</title>
   <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top, rgba(95, 78, 255, .18), transparent 34%),
-        #0b0d12;
-      color: #f5f7fb;
-      padding: 24px;
+    :root{
+      color-scheme:dark;
+      --bg:#07100c;--panel:#0d1813;--panel2:#122019;--line:#23352c;
+      --text:#f2f6f3;--muted:#91a399;--gold:#f0c75e;--green:#64d98b;
+      --red:#ff7c7c;--blue:#7cb7ff;--radius:18px;
     }
-    .wrap { max-width: 760px; margin: 0 auto; }
-    .eyebrow {
-      display: inline-block;
-      padding: 7px 11px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 999px;
-      color: #bfc5d2;
-      font-size: 12px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-    h1 {
-      margin: 18px 0 8px;
-      font-size: clamp(42px, 10vw, 76px);
-      line-height: .95;
-    }
-    .lead {
-      margin: 0 0 26px;
-      color: #aeb5c3;
-      font-size: 18px;
-      line-height: 1.55;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 14px;
-    }
-    .card {
-      padding: 18px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.045);
-      box-shadow: 0 18px 50px rgba(0,0,0,.25);
-    }
-    .card strong { display:block; margin-bottom:6px; font-size:18px; }
-    .card span { color:#9ea6b6; line-height:1.45; font-size:14px; }
-    .status {
-      margin-top: 18px;
-      padding: 16px 18px;
-      border-radius: 16px;
-      background: #f5f7fb;
-      color: #0b0d12;
-      font-weight: 800;
-      text-align: center;
-    }
-    @media (max-width: 560px) {
-      body { padding: 18px; }
-      .grid { grid-template-columns: 1fr; }
-    }
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% -20%,#183527 0,transparent 38%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+    button,input,select{font:inherit} button{border:0;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .app{max-width:780px;margin:auto;padding:16px 14px 96px}.top{position:sticky;top:0;z-index:10;background:rgba(7,16,12,.92);backdrop-filter:blur(14px);margin:-16px -14px 14px;padding:calc(12px + env(safe-area-inset-top)) 14px 12px;border-bottom:1px solid var(--line)}
+    .brandrow,.row,.between{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}.brand{font-weight:900;letter-spacing:-.03em;font-size:19px}.beta{font-size:10px;padding:4px 7px;border-radius:999px;background:#203629;color:#9ee6b5;font-weight:900;letter-spacing:.08em}.wallet{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:12px;color:var(--muted)}.pill b{color:var(--text)}
+    .hero{padding:18px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,#11241a,#0b1611);box-shadow:0 18px 60px rgba(0,0,0,.22)}.hero h1{font-size:31px;line-height:1;margin:0 0 9px;letter-spacing:-.05em}.hero p{margin:0;color:var(--muted);line-height:1.5;font-size:14px}.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:15px}.loop div{padding:9px 5px;text-align:center;border-radius:12px;background:#0a140f;border:1px solid #1f3027;font-size:11px;color:#b9c6bf}.loop b{display:block;color:var(--gold);font-size:15px;margin-bottom:3px}
+    .tabs{display:flex;gap:7px;overflow:auto;padding:14px 0 8px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{white-space:nowrap;padding:9px 13px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:12px;color:var(--muted)}.tab.active{background:var(--text);color:#07100c;border-color:var(--text);font-weight:900}
+    .view{display:none}.view.active{display:block}.sectionTitle{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:18px 4px 9px;font-weight:900}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;min-width:0}.card h3{margin:0 0 5px;font-size:16px}.small{font-size:12px;color:var(--muted);line-height:1.4}.big{font-size:24px;font-weight:900;letter-spacing:-.04em}.emoji{font-size:26px}.action{width:100%;margin-top:10px;padding:11px;border-radius:12px;background:#1d3528;font-weight:900}.action:disabled{opacity:.4;cursor:not-allowed}.action.gold{background:var(--gold);color:#241c05}.action.red{background:#3a1d1d}.action.blue{background:#17304d}.mini{padding:7px 9px;border-radius:10px;background:#1a2a22;font-weight:800;font-size:12px}.mini.buy{color:var(--green)}.mini.sell{color:var(--gold)}
+    .inventory{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.slot{border:1px solid var(--line);background:#0a140f;border-radius:13px;padding:10px 6px;text-align:center}.slot .n{font-size:20px;font-weight:900}.slot .l{font-size:10px;color:var(--muted)}
+    .marketRow{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid #1d2d25}.marketRow:last-child{border:0}.price{font-weight:900}.delta{font-size:10px}.up{color:var(--green)}.down{color:var(--red)}
+    .quality{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.q{border:1px solid var(--line);border-radius:10px;padding:8px;flex:1;min-width:76px;text-align:center}.q b{display:block;font-size:18px}.common{color:#e6e6e6}.rare{color:#69a9ff}.epic{color:#c786ff}.legendary{color:#ffd66e}
+    .contract{padding:12px 0;border-bottom:1px solid var(--line)}.contract:last-child{border:0}.progress{height:6px;background:#07100c;border-radius:99px;overflow:hidden;margin:8px 0}.progress i{display:block;height:100%;background:var(--green)}
+    .log{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#adbbb3;max-height:330px;overflow:auto}.log div{padding:7px 0;border-bottom:1px solid #17251e}.positive{color:var(--green)}.negative{color:var(--red)}
+    .toggle{display:flex;align-items:center;gap:8px}.switch{width:43px;height:25px;padding:3px;background:#28332e;border-radius:99px}.switch i{display:block;width:19px;height:19px;border-radius:50%;background:white;transition:.2s}.switch.on{background:#287545}.switch.on i{transform:translateX(18px)}
+    .toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%) translateY(20px);background:#f5f7f5;color:#09100c;padding:11px 15px;border-radius:999px;font-size:12px;font-weight:900;opacity:0;pointer-events:none;transition:.2s;z-index:50;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(7,16,12,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:8px 12px calc(8px + env(safe-area-inset-bottom));z-index:20}.bottomIn{max-width:780px;margin:auto;display:flex;justify-content:space-between;gap:7px}.nav{flex:1;padding:9px 4px;border-radius:12px;background:transparent;color:var(--muted);font-size:10px}.nav b{display:block;font-size:17px;margin-bottom:2px}.nav.active{color:var(--text);background:var(--panel2)}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metric{padding:12px;border-radius:14px;background:#0a140f;border:1px solid var(--line)}.metric span{display:block;color:var(--muted);font-size:10px}.metric b{font-size:17px}.dangerZone{border-color:#4b2828}.reset{background:#351d1d;color:#ffb7b7}
+    @media(max-width:560px){.grid{grid-template-columns:1fr}.inventory{grid-template-columns:repeat(4,1fr)}.loop{grid-template-columns:repeat(2,1fr)}.app{padding-left:12px;padding-right:12px}.top{margin-left:-12px;margin-right:-12px}.metrics{grid-template-columns:repeat(3,1fr)}}
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <span class="eyebrow">Kelo World · Prototipo</span>
-    <h1>Economía</h1>
-    <p class="lead">Este repositorio se usará únicamente para diseñar, probar y pulir los sistemas económicos antes de integrarlos al juego completo.</p>
+<div class="app">
+  <header class="top">
+    <div class="between"><div class="brandrow"><div class="brand">KELO WORLD</div><span class="beta">ECONOMY BETA</span></div><button class="mini" onclick="saveGame(true)">Guardar</button></div>
+    <div class="wallet">
+      <span class="pill">🪙 <b id="gold">0</b> oro</span>
+      <span class="pill">📦 valor <b id="netWorth">0</b></span>
+      <span class="pill">🔥 quemado <b id="burned">0</b></span>
+      <span class="pill">🤖 Play Market <b id="botStatus">ON</b></span>
+    </div>
+  </header>
 
-    <section class="grid">
-      <article class="card">
-        <strong>Mercado</strong>
-        <span>Compra y venta entre jugadores con precios variables.</span>
-      </article>
-      <article class="card">
-        <strong>Trades</strong>
-        <span>Intercambios directos de recursos sin necesidad de dinero.</span>
-      </article>
-      <article class="card">
-        <strong>Contratos</strong>
-        <span>Acuerdos de entrega, producción y comercio entre jugadores.</span>
-      </article>
-      <article class="card">
-        <strong>Play Market</strong>
-        <span>Bots de respaldo para mantener liquidez cuando falten jugadores.</span>
-      </article>
+  <section class="hero">
+    <h1>Haz dinero. Muévelo. Arriesga.</h1>
+    <p>Esta beta prueba el núcleo económico antes del mundo 2D. Todo debe entenderse rápido, pero permitir estrategias profundas.</p>
+    <div class="loop">
+      <div><b>1</b>Produce</div><div><b>2</b>Vende / tradea</div><div><b>3</b>Mejora</div><div><b>4</b>Reinvierte</div>
+    </div>
+  </section>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-view="home">Resumen</button>
+    <button class="tab" data-view="produce">Producción</button>
+    <button class="tab" data-view="market">Mercado</button>
+    <button class="tab" data-view="workshop">Taller</button>
+    <button class="tab" data-view="contracts">Contratos</button>
+    <button class="tab" data-view="ledger">Bitácora</button>
+  </div>
+
+  <main>
+    <section class="view active" id="home">
+      <div class="sectionTitle">Tu economía</div>
+      <div class="metrics">
+        <div class="metric"><span>Oro líquido</span><b id="mGold">0</b></div>
+        <div class="metric"><span>Patrimonio</span><b id="mWorth">0</b></div>
+        <div class="metric"><span>Operaciones</span><b id="mTrades">0</b></div>
+      </div>
+      <div class="sectionTitle">Inventario</div>
+      <div class="inventory" id="inventory"></div>
+      <div class="sectionTitle">Oportunidades</div>
+      <div class="grid">
+        <div class="card"><div class="between"><div><h3>📈 Mejor precio</h3><div class="small" id="bestPrice">—</div></div><button class="mini" onclick="showView('market')">Mercado</button></div></div>
+        <div class="card"><div class="between"><div><h3>📜 Contrato activo</h3><div class="small" id="homeContract">—</div></div><button class="mini" onclick="showView('contracts')">Ver</button></div></div>
+      </div>
+      <div class="sectionTitle">Play Market</div>
+      <div class="card">
+        <div class="between"><div><h3>🤖 Liquidez automática</h3><div class="small">Simula jugadores comprando y vendiendo. Cuando haya suficientes jugadores reales, este sistema se reduce.</div></div><button class="switch on" id="botToggle" onclick="toggleBots()"><i></i></button></div>
+      </div>
     </section>
 
-    <div class="status">✅ EDITADO DIRECTAMENTE DESDE CHATGPT</div>
+    <section class="view" id="produce">
+      <div class="sectionTitle">Sectores productivos</div>
+      <div class="grid" id="producers"></div>
+      <div class="sectionTitle">Regla de diseño</div>
+      <div class="card small">La producción crea oferta. Producir demasiado el mismo recurso presiona su precio a la baja. Vender, fabricar, fusionar y completar contratos retira objetos del sistema y vuelve a crear escasez.</div>
+    </section>
+
+    <section class="view" id="market">
+      <div class="sectionTitle">Mercado global</div>
+      <div class="card">
+        <div class="between"><div class="small">Precio cambia por oferta, demanda y actividad del Play Market.</div><div class="small">Comisión <b>5%</b></div></div>
+        <div id="marketRows"></div>
+      </div>
+      <div class="sectionTitle">Trade sin oro</div>
+      <div class="card" id="barterCard"></div>
+    </section>
+
+    <section class="view" id="workshop">
+      <div class="sectionTitle">Crafting</div>
+      <div class="card">
+        <div class="between"><div><h3>⚒️ Crear equipo común</h3><div class="small">Consume 2 madera + 2 mineral + 8 oro. Los recursos desaparecen y nace una pieza comerciable.</div></div><div class="big">8🪙</div></div>
+        <button class="action gold" onclick="craftGear()">Fabricar objeto</button>
+      </div>
+      <div class="sectionTitle">Fusión 3 → 1</div>
+      <div class="card">
+        <div class="small">Usa 3 objetos de la misma calidad. La fusión consume oro y puede mejorar, fallar, bajar calidad o destruir materiales. Es uno de los grandes sinks de la economía.</div>
+        <div class="quality" id="qualities"></div>
+        <select id="fusionTier" class="action" style="background:#17261f;border:1px solid var(--line);text-align:center"></select>
+        <button class="action blue" onclick="fuseGear()">Intentar fusión</button>
+        <div class="small" id="fusionOdds" style="margin-top:9px;text-align:center"></div>
+      </div>
+    </section>
+
+    <section class="view" id="contracts">
+      <div class="sectionTitle">Contratos de entrega</div>
+      <div class="card" id="contractsList"></div>
+      <button class="action" onclick="refreshContracts(true)">Buscar nuevos contratos · 3🪙</button>
+      <div class="sectionTitle">Por qué existen</div>
+      <div class="card small">Los contratos crean demanda artificial controlada para recursos que estén perdiendo valor. En el juego real pueden venir de jugadores, gremios, ciudades o del Play Market.</div>
+    </section>
+
+    <section class="view" id="ledger">
+      <div class="sectionTitle">Telemetría económica</div>
+      <div class="metrics">
+        <div class="metric"><span>Oro creado</span><b id="goldCreated">0</b></div>
+        <div class="metric"><span>Oro quemado</span><b id="goldBurned">0</b></div>
+        <div class="metric"><span>Items destruidos</span><b id="itemsBurned">0</b></div>
+      </div>
+      <div class="sectionTitle">Últimos movimientos</div>
+      <div class="card log" id="log"></div>
+      <div class="sectionTitle">Herramientas de prueba</div>
+      <div class="card dangerZone"><div class="small">Reinicia la simulación para probar otra estrategia desde cero.</div><button class="action reset" onclick="resetGame()">Reiniciar economía</button></div>
+    </section>
   </main>
+</div>
+
+<nav class="bottom"><div class="bottomIn">
+  <button class="nav active" data-view="home"><b>🏠</b>Resumen</button>
+  <button class="nav" data-view="produce"><b>⛏️</b>Producir</button>
+  <button class="nav" data-view="market"><b>📊</b>Mercado</button>
+  <button class="nav" data-view="workshop"><b>⚒️</b>Taller</button>
+  <button class="nav" data-view="contracts"><b>📜</b>Contratos</button>
+</div></nav>
+<div class="toast" id="toast"></div>
+
+<script>
+const ITEMS={
+  egg:{name:'Huevos',icon:'🥚',base:4,min:1,max:13},
+  wheat:{name:'Trigo',icon:'🌾',base:3,min:1,max:10},
+  wood:{name:'Madera',icon:'🪵',base:5,min:2,max:15},
+  ore:{name:'Mineral',icon:'⛏️',base:7,min:3,max:20}
+};
+const PRODUCERS=[
+  {id:'farm',name:'Granja',icon:'🌾',item:'wheat',qty:3,cost:1,cool:5500,desc:'3 trigo'},
+  {id:'chicken',name:'Gallinero',icon:'🐔',item:'egg',qty:2,cost:1,cool:4500,desc:'2 huevos'},
+  {id:'forest',name:'Bosque',icon:'🌲',item:'wood',qty:2,cost:2,cool:7000,desc:'2 madera'},
+  {id:'mine',name:'Mina',icon:'⛰️',item:'ore',qty:1,cost:2,cool:8000,desc:'1 mineral'}
+];
+const TIERS=[
+  {id:'common',name:'Común',next:'rare',fee:12,success:.70,flat:.18,down:0,destroy:.12},
+  {id:'rare',name:'Raro',next:'epic',fee:28,success:.54,flat:.23,down:.10,destroy:.13},
+  {id:'epic',name:'Épico',next:'legendary',fee:65,success:.36,flat:.27,down:.18,destroy:.19},
+  {id:'legendary',name:'Legendario',next:null,fee:0,success:0,flat:1,down:0,destroy:0}
+];
+const DEFAULT={gold:90,inventory:{egg:5,wheat:4,wood:3,ore:2},gear:{common:0,rare:0,epic:0,legendary:0},prices:{egg:4,wheat:3,wood:5,ore:7},previous:{egg:4,wheat:3,wood:5,ore:7},pressure:{egg:0,wheat:0,wood:0,ore:0},cooldowns:{},bots:true,trades:0,burned:0,goldCreated:90,itemsBurned:0,contracts:[],log:[],lastTick:Date.now()};
+let S=load();
+function cloneDefault(){return JSON.parse(JSON.stringify(DEFAULT))}
+function load(){try{const x=JSON.parse(localStorage.getItem('keloEconomyBeta'));return x?Object.assign(cloneDefault(),x):cloneDefault()}catch(e){return cloneDefault()}}
+function saveGame(manual=false){localStorage.setItem('keloEconomyBeta',JSON.stringify(S));if(manual)toast('Partida guardada')}
+function money(n){return Math.round(n).toLocaleString('es-ES')}
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>e.classList.remove('show'),1800)}
+function addLog(text,type=''){S.log.unshift({time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),text,type});S.log=S.log.slice(0,80)}
+function burnGold(n,why){S.gold-=n;S.burned+=n;addLog(`🔥 -${n} oro · ${why}`,'negative')}
+function createGold(n,why){S.gold+=n;S.goldCreated+=n;addLog(`✨ +${n} oro · ${why}`,'positive')}
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===id));render()}
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>showView(b.dataset.view));
+function toggleBots(){S.bots=!S.bots;addLog(`🤖 Play Market ${S.bots?'activado':'desactivado'}`);render();saveGame()}
+function produce(id){const p=PRODUCERS.find(x=>x.id===id),now=Date.now();if((S.cooldowns[id]||0)>now)return toast('Ese sector todavía está produciendo');if(S.gold<p.cost)return toast('No tienes oro para operar');burnGold(p.cost,`coste operativo de ${p.name}`);S.inventory[p.item]+=p.qty;S.pressure[p.item]+=p.qty*.8;S.cooldowns[id]=now+p.cool;addLog(`${p.icon} +${p.qty} ${ITEMS[p.item].name}`,'positive');toast(`+${p.qty} ${ITEMS[p.item].name}`);render();saveGame()}
+function trade(item,side){const price=S.prices[item];if(side==='buy'){
+  const total=Math.ceil(price*1.05);if(S.gold<total)return toast('No tienes suficiente oro');S.gold-=total;S.burned+=total-price;S.inventory[item]++;S.pressure[item]-=1.25;S.trades++;addLog(`🛒 Compraste 1 ${ITEMS[item].name} por ${price} + comisión`);
+}else{if(S.inventory[item]<1)return toast('No tienes ese recurso');const net=Math.floor(price*.95),fee=price-net;S.inventory[item]--;S.gold+=net;S.burned+=fee;S.pressure[item]+=1.1;S.trades++;addLog(`💰 Vendiste 1 ${ITEMS[item].name} por ${net} netos`,'positive')}
+render();saveGame()}
+function craftGear(){if(S.inventory.wood<2||S.inventory.ore<2)return toast('Necesitas 2 madera + 2 mineral');if(S.gold<8)return toast('Necesitas 8 de oro');S.inventory.wood-=2;S.inventory.ore-=2;S.itemsBurned+=4;burnGold(8,'fabricación');S.gear.common++;addLog('⚒️ Fabricaste 1 equipo Común','positive');toast('Objeto común creado');render();saveGame()}
+function fuseGear(){const id=document.getElementById('fusionTier').value,t=TIERS.find(x=>x.id===id);if(!t||!t.next)return toast('Esa calidad no puede fusionarse');if(S.gear[id]<3)return toast(`Necesitas 3 objetos ${t.name}`);if(S.gold<t.fee)return toast(`Necesitas ${t.fee} oro`);S.gear[id]-=3;S.itemsBurned+=3;burnGold(t.fee,`fusión ${t.name}`);const r=Math.random();let msg='';if(r<t.success){S.gear[t.next]++;msg=`✨ ÉXITO: obtuviste 1 ${TIERS.find(x=>x.id===t.next).name}`;addLog(msg,'positive')}
+else if(r<t.success+t.flat){S.gear[id]++;S.itemsBurned-=1;msg='⚖️ Falló: recuperaste 1 objeto de la misma calidad';addLog(msg)}
+else if(r<t.success+t.flat+t.down && id!=='common'){const prev=TIERS[TIERS.findIndex(x=>x.id===id)-1].id;S.gear[prev]++;S.itemsBurned-=1;msg='⬇️ La fusión bajó una calidad';addLog(msg,'negative')}
+else{msg='💥 Los materiales fueron destruidos';addLog(msg,'negative')}toast(msg);render();saveGame()}
+function refreshContracts(paid=false){if(paid){if(S.gold<3)return toast('Necesitas 3 oro');burnGold(3,'buscar contratos')}const keys=Object.keys(ITEMS);S.contracts=Array.from({length:3},(_,i)=>{const item=keys[Math.floor(Math.random()*keys.length)],qty=3+Math.floor(Math.random()*7),premium=1.18+Math.random()*.30;return{id:Date.now()+i,item,qty,reward:Math.ceil(S.prices[item]*qty*premium)}});addLog('📜 Nuevos contratos disponibles');render();saveGame()}
+function completeContract(id){const c=S.contracts.find(x=>x.id===id);if(!c)return;if(S.inventory[c.item]<c.qty)return toast('No tienes suficientes recursos');S.inventory[c.item]-=c.qty;S.itemsBurned+=c.qty;createGold(c.reward,'contrato completado');S.pressure[c.item]-=c.qty*.7;S.contracts=S.contracts.filter(x=>x.id!==id);S.trades++;toast(`Contrato completado +${c.reward} oro`);render();saveGame()}
+function barter(){const keys=Object.keys(ITEMS),give=keys[Math.floor(Math.random()*keys.length)];let get=keys.filter(x=>x!==give)[Math.floor(Math.random()*3)];const giveQty=2+Math.floor(Math.random()*3),value=S.prices[give]*giveQty,getQty=Math.max(1,Math.round(value/S.prices[get]));return{give,get,giveQty,getQty}}
+let barterOffer=barter();
+function acceptBarter(){const o=barterOffer;if(S.inventory[o.give]<o.giveQty)return toast('No tienes suficiente para ese trade');S.inventory[o.give]-=o.giveQty;S.inventory[o.get]+=o.getQty;S.trades++;S.pressure[o.give]+=o.giveQty*.5;S.pressure[o.get]-=o.getQty*.5;addLog(`🤝 Trade: ${o.giveQty} ${ITEMS[o.give].name} → ${o.getQty} ${ITEMS[o.get].name}`);barterOffer=barter();toast('Trade completado');render();saveGame()}
+function newBarter(){barterOffer=barter();render()}
+function marketTick(){for(const k of Object.keys(ITEMS)){S.previous[k]=S.prices[k];const spec=ITEMS[k];let impulse=(Math.random()-.5)*.8-S.pressure[k]*.09;if(S.bots)impulse+=(spec.base-S.prices[k])*.10+(Math.random()-.5)*.45;let p=S.prices[k]+impulse;S.prices[k]=Math.max(spec.min,Math.min(spec.max,Math.round(p*10)/10));S.pressure[k]*=.72}if(S.bots&&Math.random()<.35)addLog('🤖 Play Market ajustó liquidez');render();saveGame()}
+function netWorth(){let n=S.gold;for(const k in ITEMS)n+=S.inventory[k]*S.prices[k];const gearValues={common:18,rare:55,epic:180,legendary:700};for(const k in gearValues)n+=S.gear[k]*gearValues[k];return Math.round(n)}
+function render(){
+  const worth=netWorth();document.getElementById('gold').textContent=money(S.gold);document.getElementById('netWorth').textContent=money(worth);document.getElementById('burned').textContent=money(S.burned);document.getElementById('botStatus').textContent=S.bots?'ON':'OFF';document.getElementById('botToggle').classList.toggle('on',S.bots);
+  document.getElementById('mGold').textContent=money(S.gold);document.getElementById('mWorth').textContent=money(worth);document.getElementById('mTrades').textContent=S.trades;
+  document.getElementById('inventory').innerHTML=Object.entries(ITEMS).map(([k,x])=>`<div class="slot"><div>${x.icon}</div><div class="n">${S.inventory[k]}</div><div class="l">${x.name}</div></div>`).join('');
+  const best=Object.keys(ITEMS).sort((a,b)=>(S.prices[b]/ITEMS[b].base)-(S.prices[a]/ITEMS[a].base))[0];document.getElementById('bestPrice').innerHTML=`${ITEMS[best].icon} ${ITEMS[best].name}: <b>${S.prices[best]} oro</b> (${Math.round((S.prices[best]/ITEMS[best].base-1)*100)}% vs base)`;
+  document.getElementById('homeContract').textContent=S.contracts[0]?`${S.contracts[0].qty} ${ITEMS[S.contracts[0].item].name} → ${S.contracts[0].reward} oro`:'Busca nuevos contratos';
+  document.getElementById('producers').innerHTML=PRODUCERS.map(p=>{const left=Math.max(0,(S.cooldowns[p.id]||0)-Date.now());return`<div class="card"><div class="between"><div><div class="emoji">${p.icon}</div><h3>${p.name}</h3><div class="small">Produce ${p.desc} · coste ${p.cost}🪙</div></div><div class="price">${ITEMS[p.item].icon} ${S.prices[p.item]}</div></div><button class="action" ${left>0?'disabled':''} onclick="produce('${p.id}')">${left>0?'Produciendo… '+Math.ceil(left/1000)+'s':'Producir ahora'}</button></div>`}).join('');
+  document.getElementById('marketRows').innerHTML=Object.entries(ITEMS).map(([k,x])=>{const d=S.prices[k]-S.previous[k];return`<div class="marketRow"><div><b>${x.icon} ${x.name}</b><div class="small">Tienes ${S.inventory[k]} · base ${x.base}</div></div><div><div class="price">${S.prices[k]}🪙</div><div class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}</div></div><div><button class="mini buy" onclick="trade('${k}','buy')">Comprar</button> <button class="mini sell" onclick="trade('${k}','sell')">Vender</button></div></div>`}).join('');
+  const o=barterOffer;document.getElementById('barterCard').innerHTML=`<div class="between"><div><h3>🤝 Oferta del mercado</h3><div class="small">Entrega <b>${o.giveQty} ${ITEMS[o.give].icon} ${ITEMS[o.give].name}</b><br>Recibe <b>${o.getQty} ${ITEMS[o.get].icon} ${ITEMS[o.get].name}</b></div></div><div><button class="mini" onclick="newBarter()">Otra</button></div></div><button class="action" onclick="acceptBarter()">Aceptar trade</button>`;
+  document.getElementById('qualities').innerHTML=TIERS.map(t=>`<div class="q ${t.id}"><span class="small">${t.name}</span><b>${S.gear[t.id]}</b></div>`).join('');
+  const select=document.getElementById('fusionTier');const old=select.value;select.innerHTML=TIERS.filter(t=>t.next).map(t=>`<option value="${t.id}">${t.name} · ${t.fee}🪙</option>`).join('');if(old)select.value=old;const t=TIERS.find(x=>x.id===select.value)||TIERS[0];document.getElementById('fusionOdds').textContent=`Éxito ${Math.round(t.success*100)}% · queda igual ${Math.round(t.flat*100)}% · downgrade ${Math.round(t.down*100)}% · destrucción ${Math.round(t.destroy*100)}%`;
+  document.getElementById('contractsList').innerHTML=S.contracts.length?S.contracts.map(c=>{const have=S.inventory[c.item],pc=Math.min(100,have/c.qty*100);return`<div class="contract"><div class="between"><div><b>${ITEMS[c.item].icon} Entrega ${c.qty} ${ITEMS[c.item].name}</b><div class="small">Tienes ${have} · recompensa <b>${c.reward}🪙</b></div></div><button class="mini" onclick="completeContract(${c.id})">Entregar</button></div><div class="progress"><i style="width:${pc}%"></i></div></div>`}).join(''):'<div class="small">No hay contratos. Busca nuevos.</div>';
+  document.getElementById('goldCreated').textContent=money(S.goldCreated);document.getElementById('goldBurned').textContent=money(S.burned);document.getElementById('itemsBurned').textContent=money(S.itemsBurned);document.getElementById('log').innerHTML=S.log.length?S.log.map(x=>`<div class="${x.type}">[${x.time}] ${x.text}</div>`).join(''):'<div>Aún no hay movimientos.</div>';
+}
+document.getElementById('fusionTier').addEventListener('change',render);
+function resetGame(){if(!confirm('¿Reiniciar toda la economía de prueba?'))return;S=cloneDefault();barterOffer=barter();refreshContracts(false);addLog('♻️ Economía reiniciada');render();saveGame();toast('Economía reiniciada')}
+if(!S.contracts.length)refreshContracts(false);addLog('🟢 Sesión de economía iniciada');render();
+setInterval(render,1000);setInterval(marketTick,5000);setInterval(()=>saveGame(false),8000);
+</script>
 </body>
 </html>
