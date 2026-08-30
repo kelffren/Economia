@@ -28,7 +28,7 @@ jobs:
       - name: Build preview site
         run: |
           mkdir -p _site
-          cp prototypes/EcoV1_Bot_Economy_Lab_v2.html _site/index.html
+          cp prototypes/EcoV1_Bot_Economy_Lab_v3.html _site/index.html
           touch _site/.nojekyll
 
       - name: Setup Pages
